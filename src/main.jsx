@@ -1,9 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import RegisterPage from "../pages/register";
+import "./index.css";
+import EmpyreanApp from "./EmpyreanApp";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RegisterPage />
-  </React.StrictMode>,
+    <EmpyreanApp />
+  </React.StrictMode>
 );
