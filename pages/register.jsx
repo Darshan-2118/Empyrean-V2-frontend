@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "../styles/register.module.css";
+import { checkHealth } from "../src/api.js";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -8,6 +9,13 @@ export default function RegisterPage() {
     password: "",
   });
   const [message, setMessage] = useState("");
+  const [backendStatus, setBackendStatus] = useState("checking"); // "checking" | "ok" | "error"
+
+  useEffect(() => {
+    checkHealth().then((result) => {
+      setBackendStatus(result.ok ? "ok" : "error");
+    });
+  }, []);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -28,6 +36,24 @@ export default function RegisterPage() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
+        <div className={styles.statusBar}>
+          <span
+            className={
+              backendStatus === "checking"
+                ? styles.statusChecking
+                : backendStatus === "ok"
+                  ? styles.statusOk
+                  : styles.statusError
+            }
+          >
+            {backendStatus === "checking"
+              ? "Connecting to server..."
+              : backendStatus === "ok"
+                ? "Server connected"
+                : "Server unavailable"}
+          </span>
+        </div>
+
         <h1 className={styles.title}>Create an account</h1>
         <p className={styles.subtitle}>
           Join Empyrean with a few simple details.
