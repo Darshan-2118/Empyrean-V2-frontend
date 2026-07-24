@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styles from "../styles/register.module.css";
 import { checkHealth } from "../src/api.js";
 
-export default function RegisterPage() {
+export default function RegisterPage({ onRegisterSuccess }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -31,6 +31,10 @@ export default function RegisterPage() {
     }
 
     setMessage(`Welcome, ${formData.name}! Your account has been created.`);
+
+    if (typeof onRegisterSuccess === "function") {
+      onRegisterSuccess();
+    }
   };
 
   return (
