@@ -1,295 +1,37 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import {
-  ArrowRight,
-  Radar,
-  MapPin,
-  ShieldCheck,
-  ChevronRight,
-  Menu,
-  X,
-} from "lucide-react";
+import React, { useState } from "react";
+import styles from "../styles/register.module.css";
 
-const c = {
-  navy: "#0B1D3A",
-  navyDeep: "#071429",
-  navyMid: "#12335c",
-  amber: "#E8A33D",
-  blue: "#5FB2DE",
-  mint: "#3FD8A6",
-  paper: "#F6F4EF",
-  paperDim: "#EAE7DE",
-  fieldBg: "#FCFBF8",
-  fieldBorder: "#D7D2C4",
-  ink: "#142033",
-  inkSoft: "#4C5A70",
-  inkOnNavy: "#DCE6F2",
-  inkOnNavySoft: "#8FA3BE",
-};
+export default function RegisterPage() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const [message, setMessage] = useState("");
 
-const display = { fontFamily: "'Space Grotesk', sans-serif" };
-const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-const PROFILES = {
-  general: {
-    label: "General",
-    icon: "◎",
-    desc: "Standard WHO guideline thresholds",
-    pm25: "35 µg/m³",
-    pm10: "70 µg/m³",
-    gas: "1000 ppm",
-    style: "Standard",
-    severity: "Standard",
-    color: c.mint,
-  },
-  asthma: {
-    label: "Asthma",
-    icon: "◐",
-    desc: "Alerts on the mildest threshold breach",
-    pm25: "12 µg/m³",
-    pm10: "30 µg/m³",
-    gas: "700 ppm",
-    style: "Immediate on mild breach",
-    severity: "Elevated",
-    color: c.amber,
-  },
-  child: {
-    label: "Child",
-    icon: "◒",
-    desc: "Strictest limits, under 12",
-    pm25: "9 µg/m³",
-    pm10: "25 µg/m³",
-    gas: "600 ppm",
-    style: "All pollutants — strict",
-    severity: "Strictest",
-    color: c.amber,
-  },
-  elderly: {
-    label: "Elderly",
-    icon: "◑",
-    desc: "Sustained-exposure focus, 65+",
-    pm25: "15 µg/m³",
-    pm10: "35 µg/m³",
-    gas: "750 ppm",
-    style: "Sustained exposure focus",
-    severity: "Elevated",
-    color: c.blue,
-  },
-};
+  const handleSubmit = (event) => {
+    event.preventDefault();
 
-const CONDITIONS = [
-  "Allergic Rhinitis",
-  "Asthma",
-  "Bronchiectasis",
-  "Chronic Bronchitis",
-  "COPD",
-  "Cystic Fibrosis",
-  "Emphysema",
-  "Hypersensitivity Pneumonitis",
-  "Pulmonary Fibrosis",
-  "Sleep Apnea",
-];
+    if (!formData.name || !formData.email || !formData.password) {
+      setMessage("Please fill in all fields before continuing.");
+      return;
+    }
 
-const CONDITION_ADJUST = {
-  COPD: { severity: "Critical", color: "#E8637A" },
-  "Cystic Fibrosis": { severity: "Critical", color: "#E8637A" },
-  "Pulmonary Fibrosis": { severity: "Elevated", color: c.amber },
-  Bronchiectasis: { severity: "Elevated", color: c.amber },
-};
-
-function formatNum(n) {
-  if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
-  return n.toLocaleString();
-}
-
-function Counter({ target, unit, label }) {
-  const [value, setValue] = useState(0);
-  const ref = useRef(null);
-  const done = useRef(false);
-
-  useEffect(() => {
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-    const node = ref.current;
-    if (!node) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !done.current) {
-            done.current = true;
-            if (reduced) {
-              setValue(target);
-              return;
-            }
-            const duration = 1400;
-            const start = performance.now();
-            function tick(now) {
-              const p = Math.min((now - start) / duration, 1);
-              const eased = 1 - Math.pow(1 - p, 3);
-              setValue(Math.floor(eased * target));
-              if (p < 1) requestAnimationFrame(tick);
-            }
-            requestAnimationFrame(tick);
-            io.unobserve(node);
-          }
-        });
-      },
-      { threshold: 0.4 }
-    );
-    io.observe(node);
-    return () => io.disconnect();
-  }, [target]);
+    setMessage(`Welcome, ${formData.name}! Your account has been created.`);
+  };
 
   return (
-    <div
-      className="text-left px-6 first:pl-0 first:border-l-0 border-l"
-      style={{ borderColor: "rgba(255,255,255,0.09)" }}
-    >
-      <div
-        ref={ref}
-        className="flex items-baseline gap-1 text-3xl font-semibold text-white"
-        style={mono}
-      >
-        {formatNum(value)}
-        <span className="text-sm font-medium" style={{ color: c.mint }}>
-          {unit}
-        </span>
-      </div>
-      <div className="text-sm mt-1" style={{ color: c.inkOnNavySoft }}>
-        {label}
-      </div>
-    </div>
-  );
-}
-
-function SensorDot({ cx, cy, tipX, tipY, tipW, aqi, statusLabel, color }) {
-  const [hover, setHover] = useState(false);
-  return (
-    <g
-      tabIndex={0}
-      style={{ cursor: "pointer" }}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
-    >
-      <circle
-        className="sensor-ring"
-        cx={cx}
-        cy={cy}
-        r={5}
-        fill="none"
-        stroke={color}
-        strokeWidth="1.5"
-      />
-      <circle cx={cx} cy={cy} r={5} fill={color} />
-      <g
-        transform={`translate(${tipX},${tipY})`}
-        style={{
-          opacity: hover ? 1 : 0,
-          transform: hover
-            ? `translate(${tipX}px,${tipY}px)`
-            : `translate(${tipX}px,${tipY + 4}px)`,
-          transition: "opacity .18s ease, transform .18s ease",
-          pointerEvents: "none",
-        }}
-      >
-        <rect width={tipW} height="34" rx="8" fill={c.navy} stroke={color} strokeWidth="1" />
-        <text x="12" y="22" fontFamily="IBM Plex Mono, monospace" fontSize="11" fill={color}>
-          AQI {aqi} · {statusLabel}
-        </text>
-      </g>
-    </g>
-  );
-}
-
-function HeroVisual() {
-  return (
-    <div>
-      <div
-        className="relative rounded-[20px] overflow-hidden border"
-        style={{
-          borderColor: "rgba(255,255,255,0.12)",
-          boxShadow: "0 30px 60px -20px rgba(0,0,0,0.55)",
-        }}
-      >
-        <svg viewBox="0 0 560 420" className="w-full h-auto block" role="img"
-          aria-label="Live map showing atmosphere clarity from ground level smog to clear upper air, with sensor readings across the city grid">
-          <defs>
-            <linearGradient id="atmo" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#0B1D3A" />
-              <stop offset="45%" stopColor="#164067" />
-              <stop offset="78%" stopColor="#3E6E5B" />
-              <stop offset="100%" stopColor="#8A6A2E" />
-            </linearGradient>
-            <radialGradient id="glow" cx="50%" cy="15%" r="60%">
-              <stop offset="0%" stopColor="#5FB2DE" stopOpacity="0.35" />
-              <stop offset="100%" stopColor="#5FB2DE" stopOpacity="0" />
-            </radialGradient>
-          </defs>
-          <rect width="560" height="420" fill="url(#atmo)" />
-          <rect width="560" height="420" fill="url(#glow)" />
-
-          <g fill="#08152B" opacity="0.55">
-            <rect x="0" y="360" width="560" height="60" />
-            <rect x="30" y="320" width="34" height="60" />
-            <rect x="80" y="300" width="26" height="80" />
-            <rect x="120" y="335" width="40" height="45" />
-            <rect x="400" y="310" width="30" height="70" />
-            <rect x="440" y="330" width="24" height="50" />
-            <rect x="480" y="295" width="36" height="85" />
-          </g>
-
-          <path
-            className="breath-line"
-            d="M20 260 C 100 190, 160 300, 230 220 S 380 150, 460 200 S 540 130, 550 90"
-            fill="none"
-            stroke="#3FD8A6"
-            strokeWidth="2"
-            strokeLinecap="round"
-            opacity="0.85"
-          />
-
-          <SensorDot cx={230} cy={220} tipX={190} tipY={178} tipW={118} aqi={42} statusLabel="Good" color={c.mint} />
-          <SensorDot cx={460} cy={200} tipX={370} tipY={158} tipW={128} aqi={58} statusLabel="Moderate" color={c.blue} />
-          <SensorDot cx={120} cy={300} tipX={60} tipY={335} tipW={126} aqi={121} statusLabel="Caution" color={c.amber} />
-        </svg>
-      </div>
-      <div
-        className="flex justify-between items-center text-xs mt-3.5 tracking-wide"
-        style={{ ...mono, color: c.inkOnNavySoft }}
-      >
-        <span>YOUR EXPOSURE PATH · TODAY 07:12–08:40</span>
-        <span style={{ color: c.mint }}>● 3 SENSORS IN RANGE</span>
-      </div>
-    </div>
-  );
-}
-
-function Nav({ route, go }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <nav
-      className="sticky top-0 z-50 border-b backdrop-blur"
-      style={{ background: "rgba(11,29,58,0.92)", borderColor: "rgba(255,255,255,0.08)" }}
-    >
-      <div className="max-w-6xl mx-auto px-8 h-[76px] flex items-center justify-between">
-        <button
-          onClick={() => go("landing")}
-          className="flex items-center gap-2.5 text-xl font-bold text-white"
-          style={{ ...display, letterSpacing: "-0.01em" }}
-        >
-          <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-            <path d="M16 2C16 2 6 12.5 6 20a10 10 0 0 0 20 0C26 12.5 16 2 16 2Z" fill="url(#navMark)" />
-            <defs>
-              <linearGradient id="navMark" x1="6" y1="2" x2="26" y2="30" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#3FD8A6" />
-                <stop offset="1" stopColor="#5FB2DE" />
-              </linearGradient>
-            </defs>
-          </svg>
-          Empyrean
-        </button>
+    <div className={styles.page}>
+      <div className={styles.card}>
+        <h1 className={styles.title}>Create an account</h1>
+        <p className={styles.subtitle}>
+          Join Empyrean with a few simple details.
+        </p>
 
         <ul className="hidden md:flex items-center gap-9 list-none m-0 p-0">
           {[

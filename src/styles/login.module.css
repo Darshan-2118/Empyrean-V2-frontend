@@ -66,3 +66,31 @@
   color: #1f7a4b;
   font-weight: 600;
 }
+
+.statusBar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.statusBar span {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.statusChecking {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.statusOk {
+  background: #d4edda;
+  color: #155724;
+}
+
+.statusError {
+  background: #f8d7da;
+  color: #721c24;
+}

@@ -1,14 +1,9 @@
-﻿import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
-import RegisterPage from "../pages/register.jsx";
-
-function App() {
-  return <RegisterPage />;
-}
+import RegisterPage from "../pages/register";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <RegisterPage />
+  </React.StrictMode>,
 );

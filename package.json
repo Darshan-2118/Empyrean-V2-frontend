@@ -2,6 +2,7 @@
   "name": "empyrean-v2-frontend",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -9,7 +10,6 @@
   },
   "dependencies": {
     "firebase": "^12.16.0",
-    "lucide-react": "^1.25.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
