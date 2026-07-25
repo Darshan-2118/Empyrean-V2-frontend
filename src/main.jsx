@@ -1,10 +1,14 @@
-import React from "react";
+﻿import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import EmpyreanApp from "./EmpyreanApp";
+import RegisterPage from "../pages/register.jsx";
+
+function App() {
+  return <RegisterPage />;
+}
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <EmpyreanApp />
+    <App />
   </React.StrictMode>
 );
