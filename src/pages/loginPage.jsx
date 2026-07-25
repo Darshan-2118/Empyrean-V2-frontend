@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import styles from "../styles/register.module.css";
-import { checkHealth } from "../src/api.js";
+import styles from "../styles/login.module.css";
+import { checkHealth } from "../api.js";
 
 export default function RegisterPage({ onRegisterSuccess }) {
   const [formData, setFormData] = useState({
