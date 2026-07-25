@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import {
   Wind,
-  Search,
   Bell,
   ChevronDown,
   User,
@@ -15,23 +14,26 @@ import {
 } from "lucide-react";
 import "../styles/dashboardLayout.css";
 
-function Tooltip({ label, children, position = "bottom" }) {
+function Tooltip({ label, children, position = "bottom", disabled = false }) {
   return (
     <div className={`tooltip ${position === "right" ? "tooltip--right" : ""}`}>
       {children}
-      <span className="tooltip__label">{label}</span>
+      {!disabled && label ? <span className="tooltip__label">{label}</span> : null}
     </div>
   );
 }
 
 function IconRailButton({ icon: Icon, label, active }) {
   return (
-    <Tooltip label={label} position="right">
+    <Tooltip label={label} position="right" disabled>
       <button
         aria-label={label}
         className={`rail-btn ${active ? "rail-btn--active" : ""}`}
       >
-        <Icon size={20} strokeWidth={1.8} />
+        <span className="rail-btn__icon">
+          <Icon size={20} strokeWidth={1.8} />
+        </span>
+        <span className="rail-btn__label">{label}</span>
       </button>
     </Tooltip>
   );
@@ -54,7 +56,7 @@ function AqiTickerSpace() {
   );
 }
 
-function ProfileMenu() {
+function ProfileMenu({ onLogout }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -65,6 +67,13 @@ function ProfileMenu() {
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
+
+  const handleLogout = () => {
+    setOpen(false);
+    if (typeof onLogout === "function") {
+      onLogout();
+    }
+  };
 
   return (
     <div className="profile" ref={ref}>
@@ -91,16 +100,20 @@ function ProfileMenu() {
           </div>
           <MenuItem icon={Users} text="Switch user" />
           <MenuItem icon={User} text="Account settings" />
-          <MenuItem icon={LogOut} text="Sign out" danger />
+          <MenuItem icon={LogOut} text="Sign out" danger onClick={handleLogout} />
         </div>
       )}
     </div>
   );
 }
 
-function MenuItem({ icon: Icon, text, danger }) {
+function MenuItem({ icon: Icon, text, danger, onClick }) {
   return (
-    <button className={`menu-item ${danger ? "menu-item--danger" : ""}`}>
+    <button
+      type="button"
+      className={`menu-item ${danger ? "menu-item--danger" : ""}`}
+      onClick={onClick}
+    >
       <Icon size={16} strokeWidth={1.8} />
       {text}
     </button>
@@ -118,7 +131,7 @@ function NotificationBell() {
   );
 }
 
-export default function EmpyreanDashboardLayout() {
+export default function EmpyreanDashboardLayout({ onLogout }) {
   return (
     <div className="dashboard">
       {/* Top bar: full width, logo lives here */}
@@ -134,21 +147,11 @@ export default function EmpyreanDashboardLayout() {
         {/* AQI ranking ticker space */}
         <AqiTickerSpace />
 
-        {/* Search */}
-        <div className="search">
-          <Search size={16} color="#7b8290" />
-          <input
-            type="text"
-            placeholder="Search areas, devices, alerts"
-            className="search__input"
-          />
-        </div>
-
         {/* Bell */}
         <NotificationBell />
 
         {/* Profile */}
-        <ProfileMenu />
+        <ProfileMenu onLogout={onLogout} />
       </header>
 
       {/* Below top bar: left rail + main content */}
