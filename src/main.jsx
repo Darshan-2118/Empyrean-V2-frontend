@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
-import RegisterPage from "../pages/register";
-import DashboardLayout from "../pages/dashboardLayout";
+import RegisterPage from "./pages/loginPage";
+import DashboardLayout from "./pages/dashboardLayout";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("register");
