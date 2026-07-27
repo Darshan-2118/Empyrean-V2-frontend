@@ -1,15 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "../styles/login.module.css";
 import { checkHealth } from "../api.js";
 
-export default function LoginPage({ onLoginSuccess, onSwitchToRegister, onSwitchToForgotPassword }) {
+export default function ForgotPasswordPage({ onResetSuccess, onSwitchToLogin }) {
   const [formData, setFormData] = useState({
     identifier: "",
     password: "",
+    confirmPassword: "",
   });
   const [message, setMessage] = useState("");
   const [backendStatus, setBackendStatus] = useState("checking");
   const passwordRef = useRef(null);
+  const confirmPasswordRef = useRef(null);
 
   useEffect(() => {
     checkHealth().then((result) => {
@@ -24,13 +26,15 @@ export default function LoginPage({ onLoginSuccess, onSwitchToRegister, onSwitch
   };
 
   const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      if (event.target.name === "identifier") {
-        passwordRef.current?.focus();
-      } else if (event.target.name === "password") {
-        handleSubmit(event);
-      }
+    if (event.key !== "Enter") return;
+
+    event.preventDefault();
+    if (event.target.name === "identifier") {
+      passwordRef.current?.focus();
+    } else if (event.target.name === "password") {
+      confirmPasswordRef.current?.focus();
+    } else if (event.target.name === "confirmPassword") {
+      event.target.form?.requestSubmit();
     }
   };
 
@@ -38,18 +42,24 @@ export default function LoginPage({ onLoginSuccess, onSwitchToRegister, onSwitch
     event.preventDefault();
 
     const missingFields = [];
-    if (!formData.identifier) missingFields.push("name or email");
-    if (!formData.password) missingFields.push("password");
+    if (!formData.identifier) missingFields.push("email or username");
+    if (!formData.password) missingFields.push("new password");
+    if (!formData.confirmPassword) missingFields.push("confirm password");
 
     if (missingFields.length) {
       setMessage(`Please fill in the missing field${missingFields.length > 1 ? "s" : ""}: ${missingFields.join(", ")}.`);
       return;
     }
 
-    setMessage(`Welcome back! You are signed in.`);
+    if (formData.password !== formData.confirmPassword) {
+      setMessage("Passwords do not match. Please re-enter them.");
+      return;
+    }
 
-    if (typeof onLoginSuccess === "function") {
-      onLoginSuccess();
+    setMessage("Password reset successfully. You can now sign in with your new password.");
+
+    if (typeof onResetSuccess === "function") {
+      onResetSuccess();
     }
   };
 
@@ -74,25 +84,25 @@ export default function LoginPage({ onLoginSuccess, onSwitchToRegister, onSwitch
           </span>
         </div>
 
-        <h1 className={styles.title}>Welcome back</h1>
-        <p className={styles.subtitle}>Sign in to continue to Empyrean.</p>
+        <h1 className={styles.title}>Reset password</h1>
+        <p className={styles.subtitle}>Enter your account details and choose a new password.</p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <label className={styles.label}>
-            Name or Email
+            Email or Username
             <input
               type="text"
               name="identifier"
               value={formData.identifier}
               onChange={handleChange}
               onKeyDown={handleKeyDown}
-              placeholder="Enter your name or email"
+              placeholder="Enter your email or username"
               className={styles.input}
             />
           </label>
 
           <label className={styles.label}>
-            Password
+            New Password
             <input
               ref={passwordRef}
               type="password"
@@ -100,36 +110,42 @@ export default function LoginPage({ onLoginSuccess, onSwitchToRegister, onSwitch
               value={formData.password}
               onChange={handleChange}
               onKeyDown={handleKeyDown}
-              placeholder="Enter your password"
+              placeholder="Enter a new password"
+              className={styles.input}
+            />
+          </label>
+
+          <label className={styles.label}>
+            Confirm Password
+            <input
+              ref={confirmPasswordRef}
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              placeholder="Re-enter your new password"
               className={styles.input}
             />
           </label>
 
           <button type="submit" className={styles.button}>
-            Login
-          </button>
-
-          <button
-            type="button"
-            className={styles.linkButton}
-            onClick={() => {
-              if (typeof onSwitchToForgotPassword === "function") {
-                onSwitchToForgotPassword();
-              }
-            }}
-          >
-            Forgot password?
+            Reset Password
           </button>
         </form>
 
         <div className={styles.secondaryAction}>
-          <span>New to Empyrean?</span>
+          <span>Remembered your password?</span>
           <button
             type="button"
             className={styles.linkButton}
-            onClick={onSwitchToRegister}
+            onClick={() => {
+              if (typeof onSwitchToLogin === "function") {
+                onSwitchToLogin();
+              }
+            }}
           >
-            Create account
+            Back to login
           </button>
         </div>
 
