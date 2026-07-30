@@ -1,139 +1,88 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import styles from "../styles/login.module.css";
-import { checkHealth } from "../api.js";
+import logoGraphic from "../assets/FINAL LOGO 1.svg";
 
-export default function LoginPage({ onLoginSuccess, onSwitchToRegister, onSwitchToForgotPassword }) {
+export default function LoginPage() {
   const [formData, setFormData] = useState({
-    identifier: "",
+    username: "",
     password: "",
   });
-  const [message, setMessage] = useState("");
-  const [backendStatus, setBackendStatus] = useState("checking");
-  const passwordRef = useRef(null);
 
-  useEffect(() => {
-    checkHealth().then((result) => {
-      setBackendStatus(result.ok ? "ok" : "error");
-    });
-  }, []);
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setMessage("");
   };
 
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      if (event.target.name === "identifier") {
-        passwordRef.current?.focus();
-      } else if (event.target.name === "password") {
-        handleSubmit(event);
-      }
-    }
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    const missingFields = [];
-    if (!formData.identifier) missingFields.push("name or email");
-    if (!formData.password) missingFields.push("password");
-
-    if (missingFields.length) {
-      setMessage(`Please fill in the missing field${missingFields.length > 1 ? "s" : ""}: ${missingFields.join(", ")}.`);
-      return;
-    }
-
-    setMessage(`Welcome back! You are signed in.`);
-
-    if (typeof onLoginSuccess === "function") {
-      onLoginSuccess();
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Login submitted", formData);
   };
 
   return (
-    <div className={styles.page}>
-      <div className={styles.card}>
-        <div className={styles.statusBar}>
-          <span
-            className={
-              backendStatus === "checking"
-                ? styles.statusChecking
-                : backendStatus === "ok"
-                  ? styles.statusOk
-                  : styles.statusError
-            }
-          >
-            {backendStatus === "checking"
-              ? "Connecting to server..."
-              : backendStatus === "ok"
-                ? "Server connected"
-                : "Server unavailable"}
-          </span>
+    <div className={styles.pageContainer}>
+      <nav className={styles.navbar}>
+        <a href="#home">Home</a>
+        <a href="#how">How it works?</a>
+        <a href="#features">Features</a>
+        <a href="#map">Live Map</a>
+        <a href="#about">About</a>
+      </nav>
+
+      <div className={styles.mainContainer}>
+        <div className={styles.glassCard}>
+          <div className={styles.leftPanel}>
+            {/* Glowing Blobs from Figma */}
+            <div className={styles.glowBlob1}></div>
+            <div className={styles.glowBlob2}></div>
+            <div className={styles.glowBlob3}></div>
+            <div className={styles.glowBlob4}></div>
+            
+            <div className={styles.logoWrapper}>
+              <img src={logoGraphic} alt="Empyrean Abstract Wave" className={styles.logoGraphic} />
+            </div>
+            <h1 className={styles.brandName}>EMPYREAN</h1>
+          </div>
+          
+          <div className={styles.rightPanel}>
+            <div className={styles.loginFormContainer}>
+              <h2 className={styles.welcomeText}>Welcome Back</h2>
+              <p className={styles.subtitleText}>Sign in to continue to <span className={styles.brandSubtitle}>EMPYREAN</span></p>
+
+              <form onSubmit={handleSubmit} className={styles.form}>
+                <div className={styles.inputGroup}>
+                  <label htmlFor="username">Email or username</label>
+                  <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className={styles.inputGroup}>
+                  <label htmlFor="password">Password</label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <button type="submit" className={styles.loginButton}>
+                  Login
+                </button>
+
+                <div className={styles.footerLinks}>
+                  <a href="#create">Create an Account</a>
+                  <a href="#forgot">Forgot password?</a>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
-
-        <h1 className={styles.title}>Welcome back</h1>
-        <p className={styles.subtitle}>Sign in to continue to Empyrean.</p>
-
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <label className={styles.label}>
-            Name or Email
-            <input
-              type="text"
-              name="identifier"
-              value={formData.identifier}
-              onChange={handleChange}
-              onKeyDown={handleKeyDown}
-              placeholder="Enter your name or email"
-              className={styles.input}
-            />
-          </label>
-
-          <label className={styles.label}>
-            Password
-            <input
-              ref={passwordRef}
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              onKeyDown={handleKeyDown}
-              placeholder="Enter your password"
-              className={styles.input}
-            />
-          </label>
-
-          <button type="submit" className={styles.button}>
-            Login
-          </button>
-
-          <button
-            type="button"
-            className={styles.linkButton}
-            onClick={() => {
-              if (typeof onSwitchToForgotPassword === "function") {
-                onSwitchToForgotPassword();
-              }
-            }}
-          >
-            Forgot password?
-          </button>
-        </form>
-
-        <div className={styles.secondaryAction}>
-          <span>New to Empyrean?</span>
-          <button
-            type="button"
-            className={styles.linkButton}
-            onClick={onSwitchToRegister}
-          >
-            Create account
-          </button>
-        </div>
-
-        {message ? <p className={styles.message}>{message}</p> : null}
       </div>
     </div>
   );

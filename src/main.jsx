@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
 import LoginPage from "./pages/login";
+import "./index.css";
 import RegisterPage from "./pages/register";
 import ForgotPasswordPage from "./pages/forgot_password";
 import DashboardLayout from "./pages/dashboardLayout";
@@ -38,9 +39,3 @@ function App() {
     />
   );
 }
-
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-);
