@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "../styles/login.module.css";
-import logoGraphic from "../assets/FINAL LOGO 1.svg";
+import logoGraphic from "../assets/landing/final-logo.svg";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -36,17 +36,24 @@ export default function LoginPage() {
             <div className={styles.glowBlob2}></div>
             <div className={styles.glowBlob3}></div>
             <div className={styles.glowBlob4}></div>
-            
+
             <div className={styles.logoWrapper}>
-              <img src={logoGraphic} alt="Empyrean Abstract Wave" className={styles.logoGraphic} />
+              <img
+                src={logoGraphic}
+                alt="Empyrean Abstract Wave"
+                className={styles.logoGraphic}
+              />
             </div>
             <h1 className={styles.brandName}>EMPYREAN</h1>
           </div>
-          
+
           <div className={styles.rightPanel}>
             <div className={styles.loginFormContainer}>
               <h2 className={styles.welcomeText}>Welcome Back</h2>
-              <p className={styles.subtitleText}>Sign in to continue to <span className={styles.brandSubtitle}>EMPYREAN</span></p>
+              <p className={styles.subtitleText}>
+                Sign in to continue to{" "}
+                <span className={styles.brandSubtitle}>EMPYREAN</span>
+              </p>
 
               <form onSubmit={handleSubmit} className={styles.form}>
                 <div className={styles.inputGroup}>

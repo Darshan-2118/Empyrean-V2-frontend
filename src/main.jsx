@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import LoginPage from "./pages/login";
-import "./index.css";
 import RegisterPage from "./pages/register";
 import ForgotPasswordPage from "./pages/forgot_password";
-import DashboardLayout from "./pages/dashboardLayout";
+import "./index.css";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("login");
@@ -19,7 +18,13 @@ function App() {
   }
 
   if (currentPage === "dashboard") {
-    return <DashboardLayout onLogout={() => setCurrentPage("login")} />;
+    // Placeholder until DashboardLayout is built
+    return (
+      <div style={{ padding: "2rem", textAlign: "center" }}>
+        <h1>Dashboard (coming soon)</h1>
+        <button onClick={() => setCurrentPage("login")}>Logout</button>
+      </div>
+    );
   }
 
   if (currentPage === "forgot-password") {
@@ -39,3 +44,9 @@ function App() {
     />
   );
 }
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+);
