@@ -12,7 +12,11 @@ const FIELD_LABELS = {
   confirmPassword: "Confirm Password",
 };
 
-export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin }) {
+export default function RegisterPage({
+  onRegisterSuccess,
+  onSwitchToLogin,
+  onSwitchToHowItWorks,
+}) {
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -152,7 +156,17 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin }) {
     <div className={styles.pageContainer}>
       <nav className={styles.navbar}>
         <a href="#home">Home</a>
-        <a href="#how">How it works?</a>
+        <a
+          href="#how"
+          onClick={(e) => {
+            e.preventDefault();
+            if (typeof onSwitchToHowItWorks === "function") {
+              onSwitchToHowItWorks();
+            }
+          }}
+        >
+          How it works?
+        </a>
         <a href="#features">Features</a>
         <a href="#map">Live Map</a>
         <a href="#about">About</a>
