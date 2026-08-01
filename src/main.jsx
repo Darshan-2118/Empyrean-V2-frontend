@@ -3,16 +3,19 @@ import ReactDOM from "react-dom/client";
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
 import ForgotPasswordPage from "./pages/forgot_password";
+import HowItWorksPage from "./pages/howItWorks";
+import LandingPage from "./pages/landingPage";
 import "./index.css";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("login");
+  const [currentPage, setCurrentPage] = useState("landing");
 
   if (currentPage === "register") {
     return (
       <RegisterPage
         onRegisterSuccess={() => setCurrentPage("login")}
         onSwitchToLogin={() => setCurrentPage("login")}
+        onSwitchToHowItWorks={() => setCurrentPage("how-it-works")}
       />
     );
   }
@@ -32,6 +35,26 @@ function App() {
       <ForgotPasswordPage
         onResetSuccess={() => setCurrentPage("login")}
         onSwitchToLogin={() => setCurrentPage("login")}
+        onSwitchToHowItWorks={() => setCurrentPage("how-it-works")}
+      />
+    );
+  }
+
+  if (currentPage === "how-it-works") {
+    return (
+      <HowItWorksPage
+        onBackHome={() => setCurrentPage("login")}
+        onSwitchToLogin={() => setCurrentPage("login")}
+        onSwitchToRegister={() => setCurrentPage("register")}
+      />
+    );
+  }
+
+  if (currentPage === "landing") {
+    return (
+      <LandingPage
+        onSwitchToLogin={() => setCurrentPage("login")}
+        onSwitchToHowItWorks={() => setCurrentPage("how-it-works")}
       />
     );
   }
@@ -41,6 +64,7 @@ function App() {
       onLoginSuccess={() => setCurrentPage("dashboard")}
       onSwitchToRegister={() => setCurrentPage("register")}
       onSwitchToForgotPassword={() => setCurrentPage("forgot-password")}
+      onSwitchToHowItWorks={() => setCurrentPage("how-it-works")}
     />
   );
 }

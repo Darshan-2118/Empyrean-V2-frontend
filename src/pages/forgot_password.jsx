@@ -8,7 +8,11 @@ const FIELD_LABELS = {
   confirmPassword: "Confirm password",
 };
 
-export default function ForgotPasswordPage({ onResetSuccess, onSwitchToLogin }) {
+export default function ForgotPasswordPage({
+  onResetSuccess,
+  onSwitchToLogin,
+  onSwitchToHowItWorks,
+}) {
   const [formData, setFormData] = useState({
     identifier: "",
     password: "",
@@ -127,7 +131,17 @@ export default function ForgotPasswordPage({ onResetSuccess, onSwitchToLogin }) 
     <div className={styles.pageContainer}>
       <nav className={styles.navbar}>
         <a href="#home">Home</a>
-        <a href="#how">How it works?</a>
+        <a
+          href="#how"
+          onClick={(e) => {
+            e.preventDefault();
+            if (typeof onSwitchToHowItWorks === "function") {
+              onSwitchToHowItWorks();
+            }
+          }}
+        >
+          How it works?
+        </a>
         <a href="#features">Features</a>
         <a href="#map">Live Map</a>
         <a href="#about">About</a>
@@ -135,26 +149,8 @@ export default function ForgotPasswordPage({ onResetSuccess, onSwitchToLogin }) 
 
       <div className={styles.mainContainer}>
         <div className={`${styles.glassCard} ${styles.forgotCard}`}>
-          {/* Empyrean logo on the LEFT */}
-          <div className={`${styles.leftPanel} ${styles.logoSlide}`}>
-            {/* Glowing Blobs from Figma */}
-            <div className={styles.glowBlob1}></div>
-            <div className={styles.glowBlob2}></div>
-            <div className={styles.glowBlob3}></div>
-            <div className={styles.glowBlob4}></div>
-
-            <div className={styles.logoWrapper}>
-              <img
-                src={logoGraphic}
-                alt="Empyrean Abstract Wave"
-                className={styles.logoGraphic}
-              />
-            </div>
-            <h1 className={styles.brandName}>EMPYREAN</h1>
-          </div>
-
-          {/* Form fields on the RIGHT */}
-          <div className={`${styles.rightPanel} ${styles.formSlideRight}`}>
+          {/* Form fields on the LEFT */}
+          <div className={`${styles.formPanel} ${styles.formSlide}`}>
             <div className={styles.loginFormContainer}>
               <h2 className={styles.welcomeText}>Reset Password</h2>
               <p className={styles.subtitleText}>
@@ -241,6 +237,24 @@ export default function ForgotPasswordPage({ onResetSuccess, onSwitchToLogin }) 
 
               {message ? <p className={styles.formMessage}>{message}</p> : null}
             </div>
+          </div>
+
+          {/* Empyrean logo on the RIGHT */}
+          <div className={`${styles.brandPanel} ${styles.brandSlide}`}>
+            {/* Glowing Blobs from Figma */}
+            <div className={styles.glowBlob1}></div>
+            <div className={styles.glowBlob2}></div>
+            <div className={styles.glowBlob3}></div>
+            <div className={styles.glowBlob4}></div>
+
+            <div className={styles.logoWrapper}>
+              <img
+                src={logoGraphic}
+                alt="Empyrean Abstract Wave"
+                className={styles.logoGraphic}
+              />
+            </div>
+            <h1 className={styles.brandName}>EMPYREAN</h1>
           </div>
         </div>
       </div>
