@@ -277,3 +277,244 @@
 .footerLinks a:hover {
   opacity: 1;
 }
+
+/* ===== Register page (same design language as login, brand on the right) ===== */
+
+/* Content-driven height so the 7 register fields fit comfortably */
+.registerCard {
+  height: auto;
+  min-height: 640px;
+}
+
+/* A bit taller than the base card so the login error slots fit without overflow */
+.loginCard {
+  height: 590px;
+}
+
+/* Taller still for the 3 forgot-password fields + error slots */
+.forgotCard {
+  height: 690px;
+}
+
+/* Slightly tighter form spacing for the extra field */
+.forgotForm {
+  gap: 1.5rem;
+}
+
+/* Form fields on the LEFT half */
+.formPanel {
+  width: 55%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 3rem;
+  border-radius: 30px 0 0 30px;
+}
+
+/* Brand/logo panel on the RIGHT half — mirrors .leftPanel but flipped */
+.brandPanel {
+  width: 45%;
+  background: linear-gradient(180deg, #021B16 0%, #0B2F28 100%);
+  border-radius: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
+  transform: scale(1.03);
+  overflow: hidden;
+}
+
+/* Compact form spacing for the extra register fields */
+.registerForm {
+  gap: 1.1rem;
+}
+
+.registerForm .inputGroup {
+  gap: 0.4rem;
+}
+
+.registerForm .inputGroup label {
+  font-size: 0.8rem;
+  color: #4cdbaf;
+  opacity: 0.9;
+}
+
+.registerForm .inputGroup input,
+.registerForm .inputGroup select {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.45rem 0;
+  font-size: 0.95rem;
+  outline: none;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: border-color 0.3s ease;
+}
+
+.registerForm .inputGroup select {
+  cursor: pointer;
+  color-scheme: dark;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.1rem center;
+  padding-right: 1.4rem;
+}
+
+/* Keep the select transparent even while focused or open */
+.registerForm .inputGroup select:focus,
+.registerForm .inputGroup select:active {
+  background-color: transparent;
+}
+
+/* The open dropdown list — dark to match the theme instead of white */
+.registerForm .inputGroup select option {
+  color: white;
+  background: #0B2F28;
+}
+
+.registerForm .inputGroup input:focus,
+.registerForm .inputGroup select:focus {
+  border-bottom-color: #4cdbaf;
+}
+
+
+/* Per-field validation message — fixed height slot so layout never shifts */
+.fieldError {
+  display: block;
+  height: 1rem;
+  line-height: 1rem;
+  font-size: 0.75rem;
+  color: #ff6b6b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Stop the browser's autofill from painting inputs as white boxes */
+.inputGroup input:-webkit-autofill,
+.inputGroup input:-webkit-autofill:hover,
+.inputGroup input:-webkit-autofill:focus,
+.inputGroup select:-webkit-autofill,
+.inputGroup select:-webkit-autofill:hover,
+.inputGroup select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset;
+  -webkit-text-fill-color: white;
+  caret-color: white;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.registerSubtitle {
+  margin-bottom: 2rem;
+}
+
+.helperText {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  text-align: center;
+  margin: 0;
+}
+
+.footerLinksCenter {
+  justify-content: center;
+  text-align: center;
+}
+
+.secondaryActionText {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.secondaryActionText a {
+  color: #4cdbaf;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+.secondaryActionText a:hover {
+  opacity: 1;
+}
+
+.formMessage {
+  font-size: 0.85rem;
+  color: #4cdbaf;
+  text-align: center;
+  margin: 1rem 0 0;
+  min-height: 1.2rem;
+}
+
+/* ===== Register page entrance animation (plays on mount after redirect) ===== */
+
+/* The logo panel glides from the centre to its spot on the right */
+@keyframes brandSlideIn {
+  from {
+    transform: translateX(-61%) scale(1.03);
+  }
+  to {
+    transform: translateX(0) scale(1.03);
+  }
+}
+
+/* The form fields, kept together as one stagnant block, glide to the left */
+@keyframes formSlideIn {
+  from {
+    transform: translateX(41%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.brandSlide {
+  animation: brandSlideIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.formSlide {
+  animation: formSlideIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brandSlide,
+  .formSlide,
+  .logoSlide,
+  .formSlideRight {
+    animation: none;
+  }
+}
+
+/* ===== Login & Forgot-password entrance animation (mirrored split) ===== */
+
+/* Logo panel on the LEFT glides from the centre to its spot on the left */
+@keyframes logoSlideInLeft {
+  from {
+    transform: translateX(61%) scale(1.03);
+  }
+  to {
+    transform: translateX(0) scale(1.03);
+  }
+}
+
+.logoSlide {
+  animation: logoSlideInLeft 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Form panel on the RIGHT glides from the centre to its spot on the right */
+@keyframes formSlideInRight {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.formSlideRight {
+  animation: formSlideInRight 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
