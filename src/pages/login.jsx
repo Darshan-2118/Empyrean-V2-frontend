@@ -10,7 +10,8 @@ const FIELD_LABELS = {
 export default function LoginPage({
   onSwitchToRegister,
   onSwitchToForgotPassword,
-  onSwitchToHowItWorks,
+  onSwitchToAbout,
+  onSwitchToFeatures,
 }) {
   const [formData, setFormData] = useState({
     username: "",
@@ -78,20 +79,10 @@ export default function LoginPage({
     <div className={styles.pageContainer}>
       <nav className={styles.navbar}>
         <a href="#home">Home</a>
-        <a
-          href="#how"
-          onClick={(e) => {
-            e.preventDefault();
-            if (typeof onSwitchToHowItWorks === "function") {
-              onSwitchToHowItWorks();
-            }
-          }}
-        >
-          How it works?
-        </a>
-        <a href="#features">Features</a>
+        <a href="#how">How it works?</a>
+        <a href="#features" onClick={(e) => { e.preventDefault(); onSwitchToFeatures?.(); }}>Features</a>
         <a href="#map">Live Map</a>
-        <a href="#about">About</a>
+        <a href="#about" onClick={(e) => { e.preventDefault(); onSwitchToAbout?.(); }}>About</a>
       </nav>
 
       <div className={styles.mainContainer}>

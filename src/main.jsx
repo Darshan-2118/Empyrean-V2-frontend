@@ -7,6 +7,9 @@ import HowItWorksPage from "./pages/howItWorks";
 import LandingPage from "./pages/landingPage";
 import "./index.css";
 
+import AboutPage from "./pages/About";
+import FeaturesPage from "./pages/Features";
+
 function App() {
   const [currentPage, setCurrentPage] = useState("landing");
 
@@ -15,7 +18,26 @@ function App() {
       <RegisterPage
         onRegisterSuccess={() => setCurrentPage("login")}
         onSwitchToLogin={() => setCurrentPage("login")}
-        onSwitchToHowItWorks={() => setCurrentPage("how-it-works")}
+        onSwitchToAbout={() => setCurrentPage("about")}
+        onSwitchToFeatures={() => setCurrentPage("features")}
+      />
+    );
+  }
+
+  if (currentPage === "about") {
+    return (
+      <AboutPage 
+        onSwitchToLogin={() => setCurrentPage("login")}
+        onSwitchToFeatures={() => setCurrentPage("features")}
+      />
+    );
+  }
+
+  if (currentPage === "features") {
+    return (
+      <FeaturesPage 
+        onSwitchToLogin={() => setCurrentPage("login")}
+        onSwitchToAbout={() => setCurrentPage("about")}
       />
     );
   }
@@ -23,7 +45,7 @@ function App() {
   if (currentPage === "dashboard") {
     // Placeholder until DashboardLayout is built
     return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
+      <div style={{ padding: "2rem", textAlign: "center", color: "white" }}>
         <h1>Dashboard (coming soon)</h1>
         <button onClick={() => setCurrentPage("login")}>Logout</button>
       </div>
@@ -35,26 +57,8 @@ function App() {
       <ForgotPasswordPage
         onResetSuccess={() => setCurrentPage("login")}
         onSwitchToLogin={() => setCurrentPage("login")}
-        onSwitchToHowItWorks={() => setCurrentPage("how-it-works")}
-      />
-    );
-  }
-
-  if (currentPage === "how-it-works") {
-    return (
-      <HowItWorksPage
-        onBackHome={() => setCurrentPage("login")}
-        onSwitchToLogin={() => setCurrentPage("login")}
-        onSwitchToRegister={() => setCurrentPage("register")}
-      />
-    );
-  }
-
-  if (currentPage === "landing") {
-    return (
-      <LandingPage
-        onSwitchToLogin={() => setCurrentPage("login")}
-        onSwitchToHowItWorks={() => setCurrentPage("how-it-works")}
+        onSwitchToAbout={() => setCurrentPage("about")}
+        onSwitchToFeatures={() => setCurrentPage("features")}
       />
     );
   }
@@ -64,7 +68,8 @@ function App() {
       onLoginSuccess={() => setCurrentPage("dashboard")}
       onSwitchToRegister={() => setCurrentPage("register")}
       onSwitchToForgotPassword={() => setCurrentPage("forgot-password")}
-      onSwitchToHowItWorks={() => setCurrentPage("how-it-works")}
+      onSwitchToAbout={() => setCurrentPage("about")}
+      onSwitchToFeatures={() => setCurrentPage("features")}
     />
   );
 }

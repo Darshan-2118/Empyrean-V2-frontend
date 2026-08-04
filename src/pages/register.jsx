@@ -12,11 +12,7 @@ const FIELD_LABELS = {
   confirmPassword: "Confirm Password",
 };
 
-export default function RegisterPage({
-  onRegisterSuccess,
-  onSwitchToLogin,
-  onSwitchToHowItWorks,
-}) {
+export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwitchToAbout, onSwitchToFeatures }) {
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -77,6 +73,11 @@ export default function RegisterPage({
       return;
     }
 
+    if (field === "email" && !/\S+@\S+\.\S+/.test(value)) {
+      setErrors((prev) => ({ ...prev, email: "Invalid email format" }));
+      return;
+    }
+
     if (field === "confirmPassword" && formData.password !== value) {
       setErrors((prev) => ({
         ...prev,
@@ -130,6 +131,9 @@ export default function RegisterPage({
         newErrors[field] = `${FIELD_LABELS[field]} is required`;
       }
     }
+    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Invalid email format";
+    }
     if (
       formData.confirmPassword &&
       formData.password !== formData.confirmPassword
@@ -145,7 +149,7 @@ export default function RegisterPage({
       return;
     }
 
-    setMessage(`Welcome, ${formData.name}! Your account has been created.`);
+    setMessage("Registration successful!");
 
     if (typeof onRegisterSuccess === "function") {
       onRegisterSuccess();
@@ -155,21 +159,11 @@ export default function RegisterPage({
   return (
     <div className={styles.pageContainer}>
       <nav className={styles.navbar}>
-        <a href="#home">Home</a>
-        <a
-          href="#how"
-          onClick={(e) => {
-            e.preventDefault();
-            if (typeof onSwitchToHowItWorks === "function") {
-              onSwitchToHowItWorks();
-            }
-          }}
-        >
-          How it works?
-        </a>
-        <a href="#features">Features</a>
+        <a href="#home" onClick={(e) => { e.preventDefault(); onSwitchToLogin?.(); }}>Home</a>
+        <a href="#how">How it works?</a>
+        <a href="#features" onClick={(e) => { e.preventDefault(); onSwitchToFeatures?.(); }}>Features</a>
         <a href="#map">Live Map</a>
-        <a href="#about">About</a>
+        <a href="#about" onClick={(e) => { e.preventDefault(); onSwitchToAbout?.(); }}>About</a>
       </nav>
 
       <div className={styles.mainContainer}>
