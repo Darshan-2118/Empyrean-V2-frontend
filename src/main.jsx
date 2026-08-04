@@ -3,13 +3,15 @@ import ReactDOM from "react-dom/client";
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
 import ForgotPasswordPage from "./pages/forgot_password";
+import HowItWorksPage from "./pages/howItWorks";
+import LandingPage from "./pages/landingPage";
 import "./index.css";
 
 import AboutPage from "./pages/About";
 import FeaturesPage from "./pages/Features";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("login");
+  const [currentPage, setCurrentPage] = useState("landing");
 
   if (currentPage === "register") {
     return (
