@@ -16,6 +16,8 @@ function App() {
       <RegisterPage
         onRegisterSuccess={() => setCurrentPage("login")}
         onSwitchToLogin={() => setCurrentPage("login")}
+        onSwitchToAbout={() => setCurrentPage("about")}
+        onSwitchToFeatures={() => setCurrentPage("features")}
       />
     );
   }
@@ -53,6 +55,8 @@ function App() {
       <ForgotPasswordPage
         onResetSuccess={() => setCurrentPage("login")}
         onSwitchToLogin={() => setCurrentPage("login")}
+        onSwitchToAbout={() => setCurrentPage("about")}
+        onSwitchToFeatures={() => setCurrentPage("features")}
       />
     );
   }

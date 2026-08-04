@@ -8,7 +8,7 @@ const FIELD_LABELS = {
   confirmPassword: "Confirm password",
 };
 
-export default function ForgotPasswordPage({ onResetSuccess, onSwitchToLogin }) {
+export default function ForgotPasswordPage({ onResetSuccess, onSwitchToLogin, onSwitchToAbout, onSwitchToFeatures }) {
   const [formData, setFormData] = useState({
     identifier: "",
     password: "",
@@ -126,11 +126,11 @@ export default function ForgotPasswordPage({ onResetSuccess, onSwitchToLogin }) 
   return (
     <div className={styles.pageContainer}>
       <nav className={styles.navbar}>
-        <a href="#home">Home</a>
+        <a href="#home" onClick={(e) => { e.preventDefault(); onSwitchToLogin?.(); }}>Home</a>
         <a href="#how">How it works?</a>
-        <a href="#features">Features</a>
+        <a href="#features" onClick={(e) => { e.preventDefault(); onSwitchToFeatures?.(); }}>Features</a>
         <a href="#map">Live Map</a>
-        <a href="#about">About</a>
+        <a href="#about" onClick={(e) => { e.preventDefault(); onSwitchToAbout?.(); }}>About</a>
       </nav>
 
       <div className={styles.mainContainer}>
