@@ -5,6 +5,9 @@ import RegisterPage from "./pages/register";
 import ForgotPasswordPage from "./pages/forgot_password";
 import "./index.css";
 
+import AboutPage from "./pages/About";
+import FeaturesPage from "./pages/Features";
+
 function App() {
   const [currentPage, setCurrentPage] = useState("login");
 
@@ -17,10 +20,28 @@ function App() {
     );
   }
 
+  if (currentPage === "about") {
+    return (
+      <AboutPage 
+        onSwitchToLogin={() => setCurrentPage("login")}
+        onSwitchToFeatures={() => setCurrentPage("features")}
+      />
+    );
+  }
+
+  if (currentPage === "features") {
+    return (
+      <FeaturesPage 
+        onSwitchToLogin={() => setCurrentPage("login")}
+        onSwitchToAbout={() => setCurrentPage("about")}
+      />
+    );
+  }
+
   if (currentPage === "dashboard") {
     // Placeholder until DashboardLayout is built
     return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
+      <div style={{ padding: "2rem", textAlign: "center", color: "white" }}>
         <h1>Dashboard (coming soon)</h1>
         <button onClick={() => setCurrentPage("login")}>Logout</button>
       </div>
@@ -41,6 +62,8 @@ function App() {
       onLoginSuccess={() => setCurrentPage("dashboard")}
       onSwitchToRegister={() => setCurrentPage("register")}
       onSwitchToForgotPassword={() => setCurrentPage("forgot-password")}
+      onSwitchToAbout={() => setCurrentPage("about")}
+      onSwitchToFeatures={() => setCurrentPage("features")}
     />
   );
 }
