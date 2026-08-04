@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Aboreto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gugi&family=Aboreto&display=swap');
 
 /* ===== Empyrean landing page =====
    Same deep-green striped background as the auth pages. The hero fills the
@@ -11,6 +11,7 @@
   width: 100%;
   overflow-x: hidden;
   background:
+    linear-gradient(90deg, rgba(217, 217, 217, 0) 0%, #0c4137 77.4%, #ffffff 100%),
     linear-gradient(rgba(10, 31, 31, 0.7), rgba(10, 31, 31, 0.7)),
     repeating-linear-gradient(
       90deg,
@@ -19,7 +20,10 @@
       #0c2a22 40px,
       #0c2a22 80px
     );
-  font-family: 'Space Grotesk', sans-serif;
+  /* The teal→white gradient overlays the striped base; the dark veil and
+     stripes keep normal compositing. */
+  background-blend-mode: overlay, normal, normal;
+  font-family: 'Gugi', sans-serif;
   color: white;
 }
 
@@ -56,7 +60,7 @@
 }
 
 .logoText {
-  font-family: 'Aboreto', cursive;
+  font-family: 'Gugi', sans-serif;
   font-size: 0.6rem;
   letter-spacing: 0.38em;
   color: #e8f4ee;
@@ -71,7 +75,7 @@
   color: #e8f0ec;
   text-decoration: none;
   font-size: 0.98rem;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0.5px;
   transition: color 0.3s ease;
 }
@@ -130,7 +134,7 @@
 }
 
 .tagline {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Gugi', sans-serif;
   font-size: 1.15rem;
   letter-spacing: 0.22em;
   color: rgba(230, 240, 235, 0.82);
@@ -140,11 +144,14 @@
 }
 
 .textColumns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   gap: 3.5rem;
-  max-width: 760px;
-  margin: 2.75rem auto 0;
+  /* Symmetric: both paragraphs keep the same 3rem inset from their edge, so
+     the right one mirrors the left and both sit clear of the centred orb. */
+  margin: 2rem 0 0;
+  padding: 0 3rem;
   animation: fadeUp 1s cubic-bezier(0.22, 1, 0.36, 1) 0.36s both;
 }
 
@@ -153,7 +160,8 @@
   font-size: 0.92rem;
   line-height: 1.7;
   color: rgba(228, 238, 233, 0.85);
-  margin: 0;
+  margin: 10px 0 0;
+  max-width: 340px;
 }
 
 .textLeft {
@@ -161,6 +169,8 @@
 }
 
 .textRight {
+  /* Mirror of the left paragraph: same 3rem inset from the right edge, so it
+     stays completely outside the orb's circle at the centre. */
   text-align: right;
 }
 
@@ -184,23 +194,27 @@
   position: absolute;
   inset: -22px;
   border-radius: 50%;
-  border: 1.5px solid rgba(244, 252, 248, 0.65);
-  box-shadow: 0 0 26px rgba(244, 252, 248, 0.15);
+  border: 4px solid #abd1c6;
+  box-shadow: 0 0 26px rgba(171, 209, 198, 0.35);
 }
 
 .orbGlow {
   position: absolute;
   inset: 0;
   border-radius: 50%;
+  /* A little green in the centre (semi-transparent, so the blurred stripes
+     show through it), then solid black for the rest of the orb's interior. */
   background: radial-gradient(
-    circle at 50% 70%,
-    rgba(150, 165, 60, 0.42) 0%,
-    rgba(100, 115, 42, 0.30) 26%,
-    rgba(12, 20, 16, 0.92) 50%,
-    rgba(4, 9, 7, 0.99) 66%,
-    transparent 76%
+    circle at 50% 50%,
+    rgba(180, 192, 126, 0.9) 0%,
+    rgba(180, 192, 126, 0.7) 15%,
+    rgba(180, 192, 126, 0.35) 28%,
+    rgba(0, 0, 0, 0.9) 48%,
+    #000000 62%,
+    #000000 100%
   );
-  filter: blur(2px);
+  -webkit-backdrop-filter: blur(160px);
+  backdrop-filter: blur(160px);
   animation: orbPulse 7s ease-in-out infinite;
 }
 
@@ -216,7 +230,7 @@
   border: 1px solid rgba(255, 255, 255, 0.25);
   padding: 0.85rem 1.8rem;
   border-radius: 999px;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Gugi', sans-serif;
   font-size: 0.95rem;
   letter-spacing: 2px;
   cursor: pointer;
@@ -233,7 +247,15 @@
   position: relative;
   z-index: 1;
   padding-top: 38vh;
-  padding-bottom: 6rem;
+  padding-bottom: 14rem;
+  /* Orb geometry shared by the feature-ball placement below: radius is
+     min(40vh, 410px) and the centre sits 38vh below the hero's bottom edge
+     (i.e. 2vh above the top of this section when the orb is at 80vh).
+     The balls orbit on --orbit-r, well OUTSIDE the orb and its white outer
+     ring (the ring's outer edge sits at orb radius + 26px). */
+  --orb-r: min(40vh, 410px);
+  --orb-cy: calc(38vh - var(--orb-r));
+  --orbit-r: calc(var(--orb-r) + 88px);
 }
 
 .featuresRow {
@@ -246,21 +268,90 @@
 }
 
 .featureItem {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.15rem;
-  width: 96px;
+  position: absolute;
+  width: 76px;
+  height: 76px;
+  z-index: 2;
 }
 
-/* Small balls ride along the big ball's curve — outer items sit higher up
-   the arc, centre items at the bottom of the arc */
-.featureItem.arcUp {
-  transform: translateY(-3rem);
+/* ===== Feature balls on the orb's lower semicircle =====
+   Each ball's centre rides on --orbit-r (orb radius + 88px), which sits
+   clearly OUTSIDE the orb AND its white outer ring. The -38px offsets centre
+   the 76px balls on that radius. pos0/pos5 are the right/left of the orb,
+   pos1/pos4 the lower-right/left, pos2/pos3 the bottom-right/left. Labels
+   are placed radially outside the circle so no text sits inside the orb. */
+
+.orbitPos0 {
+  left: calc(50vw + var(--orbit-r) - 38px);
+  top: calc(var(--orb-cy) - 38px);
 }
 
-.featureItem.arcMid {
-  transform: translateY(-1.5rem);
+.orbitPos1 {
+  left: calc(50vw + 0.809 * var(--orbit-r) - 38px);
+  top: calc(var(--orb-cy) + 0.588 * var(--orbit-r) - 38px);
+}
+
+.orbitPos2 {
+  left: calc(50vw + 0.309 * var(--orbit-r) - 38px);
+  top: calc(var(--orb-cy) + 0.951 * var(--orbit-r) - 38px);
+}
+
+.orbitPos3 {
+  left: calc(50vw - 0.309 * var(--orbit-r) - 38px);
+  top: calc(var(--orb-cy) + 0.951 * var(--orbit-r) - 38px);
+}
+
+.orbitPos4 {
+  left: calc(50vw - 0.809 * var(--orbit-r) - 38px);
+  top: calc(var(--orb-cy) + 0.588 * var(--orbit-r) - 38px);
+}
+
+.orbitPos5 {
+  left: calc(50vw - var(--orbit-r) - 38px);
+  top: calc(var(--orb-cy) - 38px);
+}
+
+/* Labels sit radially outside the circle, away from the orb */
+.featureLabel {
+  position: absolute;
+  margin: 0;
+  width: 8.5rem;
+  font-family: 'Gugi', sans-serif;
+  font-weight: 400;
+  font-size: 0.82rem;
+  color: #ffffff;
+  text-align: center;
+  line-height: 1.4;
+  letter-spacing: 0.03em;
+}
+
+/* Right-side balls: text to the right of the badge */
+.orbitPos0 .featureLabel,
+.orbitPos1 .featureLabel {
+  left: calc(100% + 1rem);
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: left;
+  width: 10rem;
+}
+
+/* Bottom balls: text below the badge */
+.orbitPos2 .featureLabel,
+.orbitPos3 .featureLabel {
+  top: calc(100% + 0.75rem);
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+/* Left-side balls: text to the left of the badge */
+.orbitPos4 .featureLabel,
+.orbitPos5 .featureLabel {
+  right: calc(100% + 1rem);
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: right;
+  width: 10rem;
 }
 
 .featureBadge {
@@ -281,17 +372,6 @@
 .featureBadge svg {
   width: 34px;
   height: 34px;
-}
-
-.featureLabel {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: 0.82rem;
-  color: #ffffff;
-  text-align: center;
-  line-height: 1.4;
-  margin: 0;
-  letter-spacing: 0.03em;
 }
 
 .labelLine2 {
@@ -322,6 +402,31 @@
   }
 }
 
+/* Scroll-reveal: sections/cards start hidden, then fade up as they enter the
+   viewport. The IntersectionObserver in landingPage.jsx adds the .revealed
+   class. An animation (not a transition) is used so the stagger delay never
+   slows down the feature-ball hover effects. */
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal {
+  opacity: 0;
+}
+
+.revealed {
+  opacity: 1;
+  animation: revealUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .wordmark,
   .tagline,
@@ -330,6 +435,14 @@
   }
 
   .orbGlow {
+    animation: none;
+  }
+
+  .reveal {
+    opacity: 1;
+  }
+
+  .revealed {
     animation: none;
   }
 }
@@ -375,14 +488,18 @@
   }
 
   .textColumns {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: center;
     gap: 1rem;
     max-width: 440px;
-    margin-top: 2rem;
+    margin: 2rem auto 0;
+    padding: 0;
   }
 
+  .textLeft,
   .textRight {
-    text-align: left;
+    text-align: center;
+    max-width: 340px;
   }
 
   .orbWrap {
@@ -409,12 +526,23 @@
   }
 
   .featureItem {
+    position: static;
     width: 80px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.9rem;
   }
 
-  .featureItem.arcUp,
-  .featureItem.arcMid {
-    transform: translateY(0);
+  .featureItem .featureLabel {
+    position: static;
+    top: auto;
+    left: auto;
+    right: auto;
+    transform: none;
+    width: auto;
+    text-align: center;
   }
 
   .featureBadge {

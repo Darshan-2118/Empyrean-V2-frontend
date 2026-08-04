@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import styles from "../styles/landing.module.css";
 import empyreanLogo from "../assets/landing/final-logo.svg";
 
@@ -165,19 +165,53 @@ const FEATURES = [
   { icon: <EyeIcon />, line1: "Secure Data", line2: "Storage" },
 ];
 
-/* Outer items ride higher on the big ball's arc, centre items at its bottom */
-const ARC_CLASSES = [
-  styles.arcUp,
-  styles.arcMid,
-  null,
-  null,
-  styles.arcMid,
-  styles.arcUp,
+/* Six balls sit on the orb's lower semicircle — right, lower-right,
+   bottom-right, bottom-left, lower-left, left */
+const ORBIT_CLASSES = [
+  styles.orbitPos0,
+  styles.orbitPos1,
+  styles.orbitPos2,
+  styles.orbitPos3,
+  styles.orbitPos4,
+  styles.orbitPos5,
 ];
 
 export default function LandingPage({ onSwitchToLogin, onSwitchToHowItWorks }) {
+  const pageRef = useRef(null);
+
+  // Scroll-reveal: fade sections/cards up as they enter the viewport.
+  useEffect(() => {
+    const root = pageRef.current;
+    if (!root) return undefined;
+
+    const revealEls = root.querySelectorAll("[data-reveal]");
+    if (!revealEls.length) return undefined;
+
+    // Fallback for browsers without IntersectionObserver — show everything.
+    if (!("IntersectionObserver" in window)) {
+      revealEls.forEach((el) => el.classList.add(styles.revealed));
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add(styles.revealed);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -48px 0px" },
+    );
+
+    revealEls.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [styles.revealed]);
+
   return (
-    <div className={styles.pageContainer}>
+    <div className={styles.pageContainer} ref={pageRef}>
       {/* ===== Hero (first viewport) ===== */}
       <section className={styles.hero}>
         <nav className={styles.navbar}>
@@ -232,11 +266,11 @@ export default function LandingPage({ onSwitchToLogin, onSwitchToHowItWorks }) {
           <div className={styles.textColumns}>
             <p className={styles.textLeft}>
               Understand the quality of the air around you through a simple,
-              intuitive experience.
+              intuitive experience
             </p>
             <p className={styles.textRight}>
               Choose cleaner routes, discover healthier places, and make
-              smarter decisions every day.
+              smarter decisions every day
             </p>
           </div>
         </main>
@@ -256,15 +290,15 @@ export default function LandingPage({ onSwitchToLogin, onSwitchToHowItWorks }) {
         </button>
       </section>
 
-      {/* ===== Features (on the green stripes, below the orb arch) ===== */}
-      <section className={styles.features}>
+      {/* ===== Features (balls on the orb's lower half, labels outside) ===== */}
+      <section data-reveal className={`${styles.features} ${styles.reveal}`}>
         <div className={styles.featuresRow}>
           {FEATURES.map((feature, index) => (
             <div
               key={feature.line1 + feature.line2}
-              className={`${styles.featureItem}${
-                ARC_CLASSES[index] ? ` ${ARC_CLASSES[index]}` : ""
-              }`}
+              data-reveal
+              className={`${styles.featureItem} ${ORBIT_CLASSES[index]} ${styles.reveal}`}
+              style={{ "--reveal-delay": `${index * 90}ms` }}
             >
               <div className={styles.featureBadge}>{feature.icon}</div>
               <p className={styles.featureLabel}>
