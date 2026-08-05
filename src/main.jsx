@@ -18,6 +18,7 @@ function App() {
       <RegisterPage
         onRegisterSuccess={() => setCurrentPage("login")}
         onSwitchToLogin={() => setCurrentPage("login")}
+        onSwitchToLanding={() => setCurrentPage("landing")}
         onSwitchToAbout={() => setCurrentPage("about")}
         onSwitchToFeatures={() => setCurrentPage("features")}
       />
@@ -28,6 +29,7 @@ function App() {
     return (
       <AboutPage 
         onSwitchToLogin={() => setCurrentPage("login")}
+        onSwitchToLanding={() => setCurrentPage("landing")}
         onSwitchToFeatures={() => setCurrentPage("features")}
       />
     );
@@ -37,6 +39,7 @@ function App() {
     return (
       <FeaturesPage 
         onSwitchToLogin={() => setCurrentPage("login")}
+        onSwitchToLanding={() => setCurrentPage("landing")}
         onSwitchToAbout={() => setCurrentPage("about")}
       />
     );
@@ -57,17 +60,44 @@ function App() {
       <ForgotPasswordPage
         onResetSuccess={() => setCurrentPage("login")}
         onSwitchToLogin={() => setCurrentPage("login")}
+        onSwitchToLanding={() => setCurrentPage("landing")}
         onSwitchToAbout={() => setCurrentPage("about")}
         onSwitchToFeatures={() => setCurrentPage("features")}
       />
     );
   }
 
+  if (currentPage === "landing") {
+    return (
+      <LandingPage
+        onSwitchToLogin={() => setCurrentPage("login")}
+        onSwitchToHowItWorks={() => setCurrentPage("howItWorks")}
+        onSwitchToLanding={() => setCurrentPage("landing")}
+        onSwitchToAbout={() => setCurrentPage("about")}
+        onSwitchToFeatures={() => setCurrentPage("features")}
+      />
+    );
+  }
+
+  if (currentPage === "login") {
+    return (
+      <LoginPage
+        onLoginSuccess={() => setCurrentPage("dashboard")}
+        onSwitchToRegister={() => setCurrentPage("register")}
+        onSwitchToForgotPassword={() => setCurrentPage("forgot-password")}
+        onSwitchToLanding={() => setCurrentPage("landing")}
+        onSwitchToAbout={() => setCurrentPage("about")}
+        onSwitchToFeatures={() => setCurrentPage("features")}
+      />
+    );
+  }
+
+  // Fallback to landing page if unknown state
   return (
-    <LoginPage
-      onLoginSuccess={() => setCurrentPage("dashboard")}
-      onSwitchToRegister={() => setCurrentPage("register")}
-      onSwitchToForgotPassword={() => setCurrentPage("forgot-password")}
+    <LandingPage
+      onSwitchToLogin={() => setCurrentPage("login")}
+      onSwitchToHowItWorks={() => setCurrentPage("howItWorks")}
+      onSwitchToLanding={() => setCurrentPage("landing")}
       onSwitchToAbout={() => setCurrentPage("about")}
       onSwitchToFeatures={() => setCurrentPage("features")}
     />
