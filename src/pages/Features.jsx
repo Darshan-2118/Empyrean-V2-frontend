@@ -35,14 +35,6 @@ export default function FeaturesPage({ onSwitchToLogin, onSwitchToAbout }) {
 
   return (
     <div className={styles.pageContainer}>
-      <nav className={styles.navbar}>
-        <a href="#home" onClick={(e) => { e.preventDefault(); onSwitchToLogin?.(); }}>Home</a>
-        <a href="#how">How it works?</a>
-        <a href="#features">Features</a>
-        <a href="#map">Live Map</a>
-        <a href="#about" onClick={(e) => { e.preventDefault(); onSwitchToAbout?.(); }}>About</a>
-      </nav>
-
       <div className={styles.mainContainer} style={{ padding: '0 2rem' }}>
         <div 
           className={styles.glassCard} 

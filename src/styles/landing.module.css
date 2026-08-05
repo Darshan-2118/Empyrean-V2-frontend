@@ -31,8 +31,8 @@
 
 .hero {
   position: relative;
-  height: 100vh;
-  min-height: 640px;
+  height: calc(100vh - 80px); /* minus the shared sticky navbar height */
+  min-height: 560px;
   z-index: 0;
 }
 

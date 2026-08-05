@@ -4,14 +4,6 @@ import styles from '../styles/login.module.css';
 export default function AboutPage({ onSwitchToLogin, onSwitchToFeatures }) {
   return (
     <div className={styles.pageContainer} style={{ overflowY: 'auto' }}>
-      <nav className={styles.navbar}>
-        <a href="#home" onClick={(e) => { e.preventDefault(); onSwitchToLogin?.(); }}>Home</a>
-        <a href="#how">How it works?</a>
-        <a href="#features" onClick={(e) => { e.preventDefault(); onSwitchToFeatures?.(); }}>Features</a>
-        <a href="#map">Live Map</a>
-        <a href="#about">About</a>
-      </nav>
-
       <div className={styles.mainContainer} style={{ padding: '0 2rem 4rem 2rem', alignItems: 'flex-start' }}>
         <div 
           className={styles.glassCard} 

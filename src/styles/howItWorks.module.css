@@ -174,103 +174,6 @@
   width: 60px;
 }
 
-/* ===== Steps ===== */
-
-.steps {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 1.5rem;
-}
-
-.stepCard {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 1.75rem 1.5rem;
-  position: relative;
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.stepCard:hover {
-  transform: translateY(-4px);
-  border-color: rgba(76, 219, 175, 0.5);
-  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
-}
-
-.stepNumber {
-  font-family: 'Gugi', sans-serif;
-  font-size: 2.4rem;
-  font-weight: 400;
-  color: #4cdbaf;
-  opacity: 0.9;
-  display: block;
-  margin-bottom: 0.9rem;
-  letter-spacing: 3px;
-}
-
-.stepTitle {
-  font-size: 1.15rem;
-  font-weight: 400;
-  margin: 0 0 0.6rem 0;
-  letter-spacing: 0.5px;
-}
-
-.stepText {
-  font-size: 0.92rem;
-  opacity: 0.8;
-  line-height: 1.6;
-  margin: 0;
-}
-
-/* ===== Features grid ===== */
-
-.features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-}
-
-.featureCard {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 2rem 1.5rem;
-  text-align: center;
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.featureCard:hover {
-  transform: translateY(-4px);
-  border-color: rgba(76, 219, 175, 0.5);
-  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
-}
-
-.featureIcon {
-  width: 84px;
-  height: 84px;
-  object-fit: contain;
-  margin-bottom: 1.1rem;
-  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.35));
-}
-
-.featureTitle {
-  font-size: 1.05rem;
-  font-weight: 400;
-  margin: 0 0 0.55rem 0;
-  letter-spacing: 0.5px;
-}
-
-.featureText {
-  font-size: 0.9rem;
-  opacity: 0.8;
-  line-height: 1.6;
-  margin: 0;
-}
-
 .sectionSubtitle {
   text-align: center;
   max-width: 620px;
@@ -280,132 +183,443 @@
   line-height: 1.6;
 }
 
-.deviceTag {
+/* ===== The Device — annotated diagram ===== */
+
+.deviceDiagram {
+  display: grid;
+  place-items: center;
+  margin: 2rem 0 2.5rem;
+  position: relative;
+}
+
+/* The drawn chassis — a pocket monitor */
+.deviceChassis {
+  position: relative;
+  width: 240px;
+  height: 316px;
+  padding: 20px;
+  background: linear-gradient(180deg, #0E3A31 0%, #08201A 100%);
+  border: 1px solid rgba(76, 219, 175, 0.45);
+  border-radius: 26px;
+  box-shadow:
+    0 30px 60px -20px rgba(0, 0, 0, 0.65),
+    0 0 44px -12px rgba(76, 219, 175, 0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Soft ambient ring behind the device */
+.deviceDiagram::before {
+  content: "";
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  border: 1px dashed rgba(76, 219, 175, 0.22);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.deviceScreen {
+  flex: 1;
+  background: #03130F;
+  border: 1px solid rgba(76, 219, 175, 0.35);
+  border-radius: 14px;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+.screenLabel {
+  font-size: 0.68rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #4cdbaf;
+  opacity: 0.85;
+  margin-bottom: 0.4rem;
+}
+
+.screenValue {
+  font-size: 3.2rem;
+  line-height: 1;
+  color: #FFFFFF;
+  letter-spacing: 2px;
+  text-shadow: 0 0 24px rgba(76, 219, 175, 0.55);
+}
+
+.screenSub {
+  font-size: 0.66rem;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 0.6rem;
+}
+
+.screenCursor {
+  width: 7px;
+  height: 15px;
+  background: #4cdbaf;
+  align-self: flex-end;
+  margin-top: 0.5rem;
+  animation: blink 1.1s steps(1) infinite;
+}
+
+.deviceCaption {
+  margin-top: 1.1rem;
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 6px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.deviceLed {
+  position: absolute;
+  bottom: 16px;
+  right: 20px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4cdbaf;
+  box-shadow: 0 0 10px #4cdbaf;
+  animation: ledPulse 2s ease-in-out infinite;
+}
+
+/* Numbered pins anchored to the chassis corners */
+.devicePin {
+  position: absolute;
+  z-index: 2;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #021B16;
+  border: 1px solid #4cdbaf;
+  color: #4cdbaf;
+  font-size: 0.68rem;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 12px rgba(76, 219, 175, 0.55);
+}
+
+.pinTL { top: -11px; left: -11px; }
+.pinBL { bottom: -11px; left: -11px; }
+.pinTR { top: -11px; right: -11px; }
+.pinBR { bottom: -11px; right: -11px; }
+
+/* Legend rows that pair with the pins via the numbered badge */
+.deviceLegend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.4rem 1.75rem;
+}
+
+.partItem {
+  position: relative;
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  padding: 0.2rem 0 0.4rem 1.15rem;
+  border-left: 1px dashed rgba(76, 219, 175, 0.4);
+}
+
+/* Node where the dashed leader meets the row */
+.partItem::before {
+  content: "";
+  position: absolute;
+  left: -3.5px;
+  top: 7px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4cdbaf;
+  box-shadow: 0 0 8px rgba(76, 219, 175, 0.8);
+}
+
+.partNum {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(76, 219, 175, 0.45);
+  color: #4cdbaf;
+  font-size: 0.7rem;
+  display: grid;
+  place-items: center;
+  margin-top: 2px;
+}
+
+.partIcon {
+  flex: none;
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  opacity: 0.95;
+  margin-top: 2px;
+}
+
+.partBody {
+  min-width: 0;
+}
+
+.partTitle {
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 0 0 0.4rem 0;
+  letter-spacing: 0.5px;
+}
+
+.partTag {
   display: inline-block;
   background: rgba(76, 219, 175, 0.12);
   border: 1px solid rgba(76, 219, 175, 0.35);
   color: #4cdbaf;
-  font-size: 0.72rem;
-  font-weight: 400;
+  font-size: 0.68rem;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   border-radius: 30px;
-  padding: 0.3rem 0.8rem;
-  margin: 0 0 0.85rem 0;
+  padding: 0.25rem 0.7rem;
+  margin: 0 0 0.6rem 0;
 }
 
-/* ===== Data-flow stage cards (icons alongside the step number) ===== */
-
-.stepIcon {
-  width: 44px;
-  height: 44px;
-  object-fit: contain;
-  margin: 0.6rem 0 1rem 0;
-  opacity: 0.9;
-}
-
-/* ===== Personalized Health Profile system ===== */
-
-.conditionGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.25rem;
-}
-
-.conditionCard {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 1.5rem;
-  text-align: left;
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.conditionCard:hover {
-  transform: translateY(-4px);
-  border-color: rgba(76, 219, 175, 0.5);
-  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
-}
-
-.conditionName {
-  font-size: 1.1rem;
-  font-weight: 400;
-  margin: 0 0 0.8rem 0;
-  letter-spacing: 0.5px;
-}
-
-.conditionSensitivity {
-  font-size: 0.9rem;
-  opacity: 0.9;
-  margin: 0 0 0.8rem 0;
-  line-height: 1.55;
-}
-
-.conditionLabel {
-  display: block;
-  font-size: 0.7rem;
-  font-weight: 400;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #4cdbaf;
-  margin-bottom: 0.25rem;
-}
-
-.conditionResponse {
+.partText {
   font-size: 0.88rem;
-  opacity: 0.78;
-  margin: 0;
+  opacity: 0.8;
   line-height: 1.6;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 0.8rem;
+  margin: 0;
 }
 
-.groupGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  margin-top: 1.25rem;
-}
+/* ===== Data flow — connected pipeline ===== */
 
-.groupCard {
+.flowTrack {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+  margin-top: 2.5rem;
+}
+
+.flowNode {
+  flex: 1;
   text-align: center;
-  background: linear-gradient(180deg, #021B16 0%, #0B2F28 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 22px;
-  padding: 2rem 1.5rem;
-  transition: transform 0.25s ease, border-color 0.25s ease;
+  padding: 0 0.9rem;
 }
 
-.groupCard:hover {
-  transform: translateY(-4px);
-  border-color: rgba(76, 219, 175, 0.5);
+.flowNodeDot {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  background: radial-gradient(circle at 30% 30%, #1c5a4c, #0B2F28 72%);
+  border: 1px solid rgba(76, 219, 175, 0.55);
+  color: #4cdbaf;
+  font-size: 0.88rem;
+  letter-spacing: 1px;
+  display: grid;
+  place-items: center;
+  box-shadow:
+    0 0 26px rgba(76, 219, 175, 0.28),
+    inset 0 0 14px rgba(0, 0, 0, 0.4);
+  position: relative;
+  z-index: 1;
 }
 
-.groupIcon {
-  width: 56px;
-  height: 56px;
-  object-fit: contain;
-  margin-bottom: 1rem;
-  opacity: 0.95;
-}
-
-.groupTitle {
+.flowNodeTitle {
   font-size: 1.05rem;
   font-weight: 400;
   margin: 0 0 0.6rem 0;
   letter-spacing: 0.5px;
 }
 
-.groupText {
-  font-size: 0.9rem;
-  opacity: 0.82;
+.flowNodeText {
+  font-size: 0.88rem;
+  opacity: 0.8;
   line-height: 1.6;
   margin: 0;
+}
+
+/* Marching-dash connector between nodes */
+.flowLink {
+  flex: 1 1 64px;
+  min-width: 40px;
+  height: 2px;
+  align-self: center;
+  margin: 0 0.25rem;
+  background-image: linear-gradient(90deg, #4cdbaf 40%, transparent 0);
+  background-size: 16px 2px;
+  background-repeat: repeat-x;
+  animation: flowDash 1.1s linear infinite;
+  opacity: 0.75;
+}
+
+/* ===== Personalized Health Profile system ===== */
+
+.profileSelector {
+  margin-top: 1rem;
+}
+
+.profileTabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.profileTab {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: white;
+  font-family: 'Gugi', sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.5px;
+  padding: 0.55rem 1.1rem;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.profileTab:hover {
+  border-color: rgba(76, 219, 175, 0.5);
+  color: #4cdbaf;
+}
+
+.profileTabActive,
+.profileTabActive:hover {
+  background: linear-gradient(180deg, #4cdbaf, #2ea97f);
+  color: #021B16;
+  border-color: transparent;
+  box-shadow: 0 8px 22px rgba(76, 219, 175, 0.3);
+}
+
+/* Readout panel for the active profile */
+.profilePanel {
+  max-width: 720px;
+  margin: 1.75rem auto 0;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 2rem 2.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Top accent line, like a display bezel */
+.profilePanel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #4cdbaf, transparent);
+}
+
+.panelHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.profileName {
+  font-size: 1.3rem;
+  font-weight: 400;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.panelMeta {
+  font-size: 0.66rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #4cdbaf;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.profileMeter {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.meterFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4cdbaf, #00c8a9);
+  border-radius: 20px;
+  box-shadow: 0 0 12px rgba(76, 219, 175, 0.6);
+  transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.meterScale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin: 0.45rem 0 0;
+}
+
+.sensitiveLabel {
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #4cdbaf;
+  margin: 1.5rem 0 0.6rem;
+}
+
+.profileChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.chip {
+  background: rgba(76, 219, 175, 0.12);
+  border: 1px solid rgba(76, 219, 175, 0.35);
+  color: #4cdbaf;
+  font-size: 0.78rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 20px;
+}
+
+.profileResponse {
+  font-size: 0.92rem;
+  opacity: 0.85;
+  line-height: 1.7;
+  margin: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.25rem;
+}
+
+.profileNote {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+.noteItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  opacity: 0.7;
+}
+
+.noteDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4cdbaf;
+  box-shadow: 0 0 8px rgba(76, 219, 175, 0.8);
+  flex: none;
 }
 
 /* ===== CTA ===== */
@@ -506,9 +720,8 @@
   transform: translateY(0);
 }
 
-/* ===== Entrance & scroll-reveal animations ===== */
+/* ===== Animations ===== */
 
-/* Hero fades up once on page load */
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -527,7 +740,7 @@
 /* Scroll-reveal: elements start hidden, then fade up as they enter the viewport.
    The IntersectionObserver in howItWorks.jsx adds the .revealed class.
    An animation (not a transition) is used so the stagger delay never slows
-   down the card hover effects. */
+   down the hover effects. */
 @keyframes revealUp {
   from {
     opacity: 0;
@@ -547,6 +760,37 @@
   opacity: 1;
   animation: revealUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   animation-delay: var(--reveal-delay, 0ms);
+}
+
+/* Marching dashes along the data-flow track */
+@keyframes flowDash {
+  to {
+    background-position: 16px 0;
+  }
+}
+
+@keyframes flowDashV {
+  to {
+    background-position: 0 16px;
+  }
+}
+
+/* Blinking cursor on the device readout */
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Pulsing status LED */
+@keyframes ledPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }
 
 /* Slow ambient drift for the background glow blobs */
@@ -587,6 +831,15 @@
   .glowBlob2 {
     animation: none;
   }
+
+  .flowLink {
+    animation: none;
+  }
+
+  .screenCursor,
+  .deviceLed {
+    animation: none;
+  }
 }
 
 /* ===== Responsive ===== */
@@ -609,6 +862,51 @@
 
   .page {
     padding: 0 1.25rem 3rem;
+  }
+
+  /* Pipeline stacks vertically, connectors run downward */
+  .flowTrack {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .flowNode {
+    width: 100%;
+    max-width: 380px;
+  }
+
+  .flowLink {
+    width: 2px;
+    height: 40px;
+    min-width: 0;
+    flex: none;
+    margin: 0.5rem 0;
+    background-image: linear-gradient(180deg, #4cdbaf 40%, transparent 0);
+    background-size: 2px 16px;
+    animation-name: flowDashV;
+  }
+
+  .deviceChassis {
+    width: 200px;
+    height: 270px;
+  }
+
+  .screenValue {
+    font-size: 2.6rem;
+  }
+
+  .deviceDiagram::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  .profilePanel {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .panelHead {
+    flex-direction: column;
+    gap: 0.25rem;
   }
 
   .cta {
