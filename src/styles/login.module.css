@@ -1,4 +1,5 @@
 ﻿@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Aboreto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gugi&family=Aboreto&display=swap');
 
 .pageContainer {
   min-height: 100vh;
@@ -15,7 +16,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Gugi', sans-serif;
   color: white;
   overflow: hidden;
 }
@@ -34,7 +35,7 @@
   color: white;
   text-decoration: none;
   font-size: 1.1rem;
-  font-weight: 500;
+  font-weight: 400;
   transition: opacity 0.3s ease;
   letter-spacing: 0.5px;
 }
@@ -181,7 +182,7 @@
 
 .welcomeText {
   font-size: 2rem;
-  font-weight: 500;
+  font-weight: 400;
   margin: 0 0 0.5rem 0;
   text-align: center;
   letter-spacing: 1px;
@@ -195,8 +196,8 @@
 }
 
 .brandSubtitle {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 300;
+  font-family: 'Gugi', sans-serif;
+  font-weight: 400;
   letter-spacing: 2px;
   font-size: 1.1rem;
 }
@@ -227,7 +228,7 @@
   padding: 0.5rem 0;
   font-size: 1rem;
   outline: none;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Gugi', sans-serif;
   transition: border-color 0.3s ease;
 }
 
@@ -242,12 +243,12 @@
   padding: 1rem;
   border-radius: 30px;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 400;
   cursor: pointer;
   margin-top: 1rem;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), inset 0 2px 5px rgba(255, 255, 255, 0.2);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Gugi', sans-serif;
   letter-spacing: 1px;
 }
 
@@ -351,7 +352,7 @@
   padding: 0.45rem 0;
   font-size: 0.95rem;
   outline: none;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Gugi', sans-serif;
   transition: border-color 0.3s ease;
 }
 

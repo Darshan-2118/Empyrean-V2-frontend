@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Aboreto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gugi&family=Aboreto&display=swap');
 
 /* ===== How It Works page =====
    Mirrors the auth pages' theme (login.module.css) — same background, fonts,
@@ -20,7 +20,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Gugi', sans-serif;
   color: white;
   position: relative;
   overflow: hidden;
@@ -71,7 +71,7 @@
   color: white;
   text-decoration: none;
   font-size: 1.1rem;
-  font-weight: 500;
+  font-weight: 400;
   transition: color 0.3s ease, opacity 0.3s ease;
   letter-spacing: 0.5px;
 }
@@ -120,7 +120,7 @@
 }
 
 .eyebrow {
-  font-family: 'Aboreto', cursive;
+  font-family: 'Gugi', sans-serif;
   font-size: 0.95rem;
   letter-spacing: 8px;
   color: #4cdbaf;
@@ -129,7 +129,7 @@
 }
 
 .heroTitle {
-  font-family: 'Aboreto', cursive;
+  font-family: 'Gugi', sans-serif;
   font-size: 3.4rem;
   font-weight: 400;
   letter-spacing: 6px;
@@ -153,7 +153,7 @@
 
 .sectionTitle {
   font-size: 1.6rem;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 1px;
   text-align: center;
   margin: 0 0 2rem 0;
@@ -200,7 +200,7 @@
 }
 
 .stepNumber {
-  font-family: 'Aboreto', cursive;
+  font-family: 'Gugi', sans-serif;
   font-size: 2.4rem;
   font-weight: 400;
   color: #4cdbaf;
@@ -212,7 +212,7 @@
 
 .stepTitle {
   font-size: 1.15rem;
-  font-weight: 600;
+  font-weight: 400;
   margin: 0 0 0.6rem 0;
   letter-spacing: 0.5px;
 }
@@ -259,7 +259,7 @@
 
 .featureTitle {
   font-size: 1.05rem;
-  font-weight: 600;
+  font-weight: 400;
   margin: 0 0 0.55rem 0;
   letter-spacing: 0.5px;
 }
@@ -286,7 +286,7 @@
   border: 1px solid rgba(76, 219, 175, 0.35);
   color: #4cdbaf;
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   border-radius: 30px;
@@ -331,7 +331,7 @@
 
 .conditionName {
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 400;
   margin: 0 0 0.8rem 0;
   letter-spacing: 0.5px;
 }
@@ -346,7 +346,7 @@
 .conditionLabel {
   display: block;
   font-size: 0.7rem;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: #4cdbaf;
@@ -396,7 +396,7 @@
 
 .groupTitle {
   font-size: 1.05rem;
-  font-weight: 600;
+  font-weight: 400;
   margin: 0 0 0.6rem 0;
   letter-spacing: 0.5px;
 }
@@ -438,7 +438,7 @@
 
 .ctaTitle {
   font-size: 1.8rem;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 1px;
   margin: 0 0 0.6rem 0;
   position: relative;
@@ -466,9 +466,9 @@
   padding: 0.9rem 2.4rem;
   border-radius: 30px;
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 400;
   cursor: pointer;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Gugi', sans-serif;
   letter-spacing: 1px;
   box-shadow: 0 10px 25px rgba(76, 219, 175, 0.25);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -490,9 +490,9 @@
   padding: 0.9rem 2.4rem;
   border-radius: 30px;
   font-size: 1.05rem;
-  font-weight: 600;
+  font-weight: 400;
   cursor: pointer;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Gugi', sans-serif;
   letter-spacing: 1px;
   transition: transform 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 }
