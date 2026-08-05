@@ -45,7 +45,7 @@ export default function AboutPage({ onSwitchToLogin, onSwitchToFeatures }) {
               <h3 style={{ color: '#4cdbaf', fontSize: '1.4rem', marginBottom: '1.5rem', fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif", textAlign: 'center' }}>
                 Meet the Team
               </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
+              <div className={styles.teamGrid}>
                 <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
                   <h4 style={{ color: '#fff', fontSize: '1.1rem', margin: '0 0 0.5rem 0', fontWeight: 600 }}>Darshan R</h4>
                   <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.9rem', margin: 0, lineHeight: '1.4' }}>Backend Development and Cloud Infrastructure</p>
