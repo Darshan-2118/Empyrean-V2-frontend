@@ -53,7 +53,7 @@ const INITIAL_FEATURES = [
   }
 ];
 
-export default function FeaturesPage({ onSwitchToLogin, onSwitchToAbout, onSwitchToLanding }) {
+export default function FeaturesPage({ onSwitchToLogin }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handleNext = () => {
@@ -73,15 +73,7 @@ export default function FeaturesPage({ onSwitchToLogin, onSwitchToAbout, onSwitc
 
   return (
     <div className={styles.pageContainer} style={{ overflowY: 'auto' }}>
-      <nav className={styles.navbar}>
-        <a href="#home" onClick={(e) => { e.preventDefault(); onSwitchToLanding?.(); }}>Home</a>
-        <a href="#how">How it works?</a>
-        <a href="#features">Features</a>
-        <a href="#map">Live Map</a>
-        <a href="#about" onClick={(e) => { e.preventDefault(); onSwitchToAbout?.(); }}>About</a>
-      </nav>
-
-      <div className={styles.mainContainer} style={{ padding: '0 2rem 4rem 2rem' }}>
+      <div className={styles.mainContainer} style={{ padding: '3rem 2rem 4rem 2rem' }}>
         <div 
           className={styles.glassCard} 
           style={{ width: '100%', maxWidth: '1150px', height: 'auto', minHeight: '650px', padding: '4rem 2rem', display: 'flex', flexWrap: 'wrap', gap: '4rem', alignItems: 'center', justifyContent: 'center' }}

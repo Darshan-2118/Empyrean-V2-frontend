@@ -107,7 +107,7 @@
 .page {
   width: 100%;
   max-width: 1080px;
-  padding: 0 2rem 4rem;
+  padding: 3rem 2rem 4rem;
   position: relative;
   z-index: 1;
 }
@@ -116,7 +116,7 @@
 
 .hero {
   text-align: center;
-  padding: 2rem 0 3rem;
+  padding: 0 0 3rem;
 }
 
 .eyebrow {
@@ -125,7 +125,7 @@
   letter-spacing: 8px;
   color: #4cdbaf;
   margin: 0 0 1rem 0;
-  text-transform: lowercase;
+  text-transform: uppercase;
 }
 
 .heroTitle {

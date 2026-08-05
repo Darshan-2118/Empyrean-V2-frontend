@@ -15,7 +15,11 @@ function App() {
   const [currentPage, setCurrentPage] = useState("landing");
 
   // Single navigation handler shared by the navbar and in-page buttons.
-  const navigate = (path) => setCurrentPage(path);
+  // Reset scroll to the top so a scrolled-down page never opens mid-way.
+  const navigate = (path) => {
+    window.scrollTo(0, 0);
+    setCurrentPage(path);
+  };
 
   let pageEl;
 
