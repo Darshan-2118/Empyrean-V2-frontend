@@ -175,7 +175,7 @@ const ARC_CLASSES = [
   styles.arcUp,
 ];
 
-export default function LandingPage({ onSwitchToLogin, onSwitchToHowItWorks }) {
+export default function LandingPage({ onSwitchToLogin, onSwitchToHowItWorks, onSwitchToFeatures, onSwitchToAbout }) {
   return (
     <div className={styles.pageContainer}>
       {/* ===== Hero (first viewport) ===== */}
@@ -203,9 +203,9 @@ export default function LandingPage({ onSwitchToLogin, onSwitchToHowItWorks }) {
             >
               How it works?
             </a>
-            <a href="#features">Features</a>
+            <a href="#features" onClick={(e) => { e.preventDefault(); onSwitchToFeatures?.(); }}>Features</a>
             <a href="#map">Live Map</a>
-            <a href="#about">About</a>
+            <a href="#about" onClick={(e) => { e.preventDefault(); onSwitchToAbout?.(); }}>About</a>
           </div>
 
           <div className={styles.navRight}>

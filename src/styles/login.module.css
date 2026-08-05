@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Aboreto&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Aboreto&display=swap');
 
 .pageContainer {
   min-height: 100vh;
@@ -288,12 +288,12 @@
 
 /* A bit taller than the base card so the login error slots fit without overflow */
 .loginCard {
-  height: 590px;
+  height: 650px;
 }
 
 /* Taller still for the 3 forgot-password fields + error slots */
 .forgotCard {
-  height: 690px;
+  height: 650px;
 }
 
 /* Slightly tighter form spacing for the extra field */
@@ -518,3 +518,23 @@
 .formSlideRight {
   animation: formSlideInRight 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+
+.teamGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .teamGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .teamGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
