@@ -12,7 +12,6 @@ export default function LoginPage({
   onSwitchToForgotPassword,
   onSwitchToAbout,
   onSwitchToFeatures,
-  onSwitchToLanding,
 }) {
   const [formData, setFormData] = useState({
     username: "",
@@ -34,48 +33,50 @@ export default function LoginPage({
         ...prev,
         [field]: `${FIELD_LABELS[field]} is required`,
       }));
+      return;
     }
+    setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      if (e.target.name === "username") {
-        passwordRef.current?.focus();
-      } else if (e.target.name === "password") {
-        e.target.form?.requestSubmit();
-      }
+    if (e.key !== "Enter") return;
+
+    e.preventDefault();
+
+    if (e.target.name === "username") {
+      passwordRef.current?.focus();
+    } else {
+      e.target.form?.requestSubmit();
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newErrors = {};
 
-    if (!formData.username) newErrors.username = "Username is required";
-    if (!formData.password) newErrors.password = "Password is required";
+    const newErrors = {};
+    for (const field of Object.keys(FIELD_LABELS)) {
+      if (!formData[field]) {
+        newErrors[field] = `${FIELD_LABELS[field]} is required`;
+      }
+    }
 
     setErrors(newErrors);
 
-    if (Object.keys(newErrors).length === 0) {
-      console.log("Login attempted with:", formData);
-      // alert('Login successful!');
-    } else {
-      if (newErrors.username) usernameRef.current?.focus();
-      else if (newErrors.password) passwordRef.current?.focus();
+    if (Object.keys(newErrors).length) {
+      const firstErrorField = Object.keys(newErrors)[0];
+      if (firstErrorField === "username") {
+        usernameRef.current?.focus();
+      } else {
+        passwordRef.current?.focus();
+      }
+      return;
     }
+
+    console.log("Login submitted", formData);
   };
 
   return (
     <div className={styles.pageContainer}>
-      <nav className={styles.navbar}>
-        <a href="#home" onClick={(e) => { e.preventDefault(); onSwitchToLanding?.(); }}>Home</a>
-        <a href="#how">How it works?</a>
-        <a href="#features" onClick={(e) => { e.preventDefault(); onSwitchToFeatures?.(); }}>Features</a>
-        <a href="#map">Live Map</a>
-        <a href="#about" onClick={(e) => { e.preventDefault(); onSwitchToAbout?.(); }}>About</a>
-      </nav>
-
       <div className={styles.mainContainer}>
         <div className={`${styles.glassCard} ${styles.loginCard}`}>
           <div className={`${styles.leftPanel} ${styles.logoSlide}`}>

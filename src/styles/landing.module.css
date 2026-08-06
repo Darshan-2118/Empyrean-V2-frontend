@@ -31,8 +31,8 @@
 
 .hero {
   position: relative;
-  height: 100vh;
-  min-height: 640px;
+  height: calc(100vh - 80px); /* minus the shared sticky navbar height */
+  min-height: 560px;
   z-index: 0;
 }
 
@@ -202,19 +202,20 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  /* A little green in the centre (semi-transparent, so the blurred stripes
-     show through it), then solid black for the rest of the orb's interior. */
+  /* A little green in the centre, then solid black for the rest of the orb's
+     interior. NOTE: no backdrop-filter here — a 160px backdrop blur over an
+     820px disc forces a full re-blur on every scroll frame (and again under
+     the sticky navbar), which flickers/glitches while scrolling. The soft
+     centre glow comes from the gradient alone. */
   background: radial-gradient(
     circle at 50% 50%,
-    rgba(180, 192, 126, 0.9) 0%,
-    rgba(180, 192, 126, 0.7) 15%,
-    rgba(180, 192, 126, 0.35) 28%,
-    rgba(0, 0, 0, 0.9) 48%,
-    #000000 62%,
+    rgba(180, 192, 126, 0.95) 0%,
+    rgba(180, 192, 126, 0.8) 12%,
+    rgba(180, 192, 126, 0.5) 24%,
+    rgba(0, 0, 0, 0.95) 48%,
+    #000000 60%,
     #000000 100%
   );
-  -webkit-backdrop-filter: blur(160px);
-  backdrop-filter: blur(160px);
   animation: orbPulse 7s ease-in-out infinite;
 }
 

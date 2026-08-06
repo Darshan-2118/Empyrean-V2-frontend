@@ -1,46 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import styles from "../styles/landing.module.css";
-import empyreanLogo from "../assets/landing/final-logo.svg";
-
-/* ===== Navbar icons ===== */
-
-function ProfileIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width="18"
-      height="18"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="8" r="4" />
-      <path d="M4 20c0-4 3.6-6 8-6s8 2 8 6" />
-    </svg>
-  );
-}
-
-function MapPinIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width="18"
-      height="18"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11Z" />
-      <circle cx="12" cy="10" r="2.5" />
-    </svg>
-  );
-}
 
 /* ===== Feature icons (darker forest green inside sage badges) ===== */
 
@@ -214,49 +173,6 @@ export default function LandingPage({ onSwitchToLogin, onSwitchToHowItWorks, onS
     <div className={styles.pageContainer} ref={pageRef}>
       {/* ===== Hero (first viewport) ===== */}
       <section className={styles.hero}>
-        <nav className={styles.navbar}>
-          <div className={styles.navLeft}>
-            <img
-              src={empyreanLogo}
-              alt="Empyrean"
-              className={styles.logoIcon}
-            />
-            <span className={styles.logoText}>EMPYREAN</span>
-          </div>
-
-          <div className={styles.navLinks}>
-            <a href="#home" className={styles.navActive}>
-              Home
-            </a>
-            <a
-              href="#how"
-              onClick={(e) => {
-                e.preventDefault();
-                onSwitchToHowItWorks?.();
-              }}
-            >
-              How it works?
-            </a>
-            <a href="#features" onClick={(e) => { e.preventDefault(); onSwitchToFeatures?.(); }}>Features</a>
-            <a href="#map">Live Map</a>
-            <a href="#about" onClick={(e) => { e.preventDefault(); onSwitchToAbout?.(); }}>About</a>
-          </div>
-
-          <div className={styles.navRight}>
-            <button
-              type="button"
-              className={styles.iconButton}
-              aria-label="Profile"
-              onClick={() => onSwitchToLogin?.()}
-            >
-              <ProfileIcon />
-            </button>
-            <button type="button" className={styles.iconButton} aria-label="Live Map">
-              <MapPinIcon />
-            </button>
-          </div>
-        </nav>
-
         <main className={styles.heroContent}>
           <h1 className={styles.wordmark}>EMPYREAN</h1>
           <p className={styles.tagline}>
