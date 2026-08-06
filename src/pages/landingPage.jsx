@@ -177,7 +177,6 @@ const ORBIT_CLASSES = [
 ];
 
 export default function LandingPage({ onSwitchToLogin, onSwitchToHowItWorks, onSwitchToFeatures, onSwitchToAbout }) {
-export default function LandingPage({ onSwitchToLogin, onSwitchToHowItWorks }) {
   const pageRef = useRef(null);
 
   // Scroll-reveal: fade sections/cards up as they enter the viewport.
