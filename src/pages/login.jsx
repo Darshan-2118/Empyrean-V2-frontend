@@ -8,6 +8,7 @@ const FIELD_LABELS = {
 };
 
 export default function LoginPage({
+  onLoginSuccess,
   onSwitchToRegister,
   onSwitchToForgotPassword,
   onSwitchToAbout,
@@ -59,7 +60,9 @@ export default function LoginPage({
 
     if (Object.keys(newErrors).length === 0) {
       console.log("Login attempted with:", formData);
-      // alert('Login successful!');
+      if (typeof onLoginSuccess === "function") {
+        onLoginSuccess();
+      }
     } else {
       if (newErrors.username) usernameRef.current?.focus();
       else if (newErrors.password) passwordRef.current?.focus();

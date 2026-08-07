@@ -9,6 +9,7 @@ import "./index.css";
 
 import AboutPage from "./pages/About";
 import FeaturesPage from "./pages/Features";
+import EmpyreanDashboardLayout from "./pages/dashboard";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("landing");
@@ -46,12 +47,8 @@ function App() {
   }
 
   if (currentPage === "dashboard") {
-    // Placeholder until DashboardLayout is built
     return (
-      <div style={{ padding: "2rem", textAlign: "center", color: "white" }}>
-        <h1>Dashboard (coming soon)</h1>
-        <button onClick={() => setCurrentPage("login")}>Logout</button>
-      </div>
+      <EmpyreanDashboardLayout />
     );
   }
 
