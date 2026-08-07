@@ -56,13 +56,7 @@ body {
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
 
-.dashboard__logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 200px;
-}
-
+/* Logo */
 .dashboard__logo-mark {
   background: linear-gradient(135deg, #00FFE6, #4cdbaf);
   padding: 6px;
@@ -71,6 +65,7 @@ body {
   align-items: center;
   justify-content: center;
   box-shadow: 0 0 15px rgba(0, 255, 230, 0.3);
+  flex-shrink: 0;
 }
 
 .dashboard__logo-text {
@@ -301,17 +296,41 @@ body {
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  padding: 32px 0;
+  padding: 24px 0;
   align-items: center;
   z-index: 5;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rail--open {
+  width: 260px;
+  align-items: stretch;
+}
+
+.rail__logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  margin-bottom: 24px;
+}
+
+.rail--open .rail__logo-container {
+  justify-content: flex-start;
+  padding: 0 24px;
 }
 
 .rail__nav, .rail__bottom {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   width: 100%;
   align-items: center;
+}
+
+.rail--open .rail__nav, .rail--open .rail__bottom {
+  align-items: stretch;
+  padding: 0 16px;
 }
 
 .rail__spacer {
@@ -322,6 +341,11 @@ body {
   width: 40px;
   height: 1px;
   background: var(--border-color);
+  margin: 0 auto;
+}
+
+.rail--open .rail__divider {
+  width: calc(100% - 32px);
 }
 
 .rail-btn {
@@ -336,6 +360,20 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.rail-btn--open {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 0 16px;
+  gap: 16px;
+}
+
+.rail-btn__text {
+  font-family: 'Gugi', sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
 }
 
 .rail-btn:hover {
