@@ -158,14 +158,6 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
 
   return (
     <div className={styles.pageContainer}>
-      <nav className={styles.navbar}>
-        <a href="#home" onClick={(e) => { e.preventDefault(); onSwitchToLogin?.(); }}>Home</a>
-        <a href="#how">How it works?</a>
-        <a href="#features" onClick={(e) => { e.preventDefault(); onSwitchToFeatures?.(); }}>Features</a>
-        <a href="#map">Live Map</a>
-        <a href="#about" onClick={(e) => { e.preventDefault(); onSwitchToAbout?.(); }}>About</a>
-      </nav>
-
       <div className={styles.mainContainer}>
         <div className={`${styles.glassCard} ${styles.registerCard}`}>
           {/* Form fields on the LEFT */}
