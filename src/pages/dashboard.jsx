@@ -4,6 +4,8 @@ import {
   LayoutDashboard, Map as MapIcon, BarChart3, Activity, AlertTriangle, CheckCircle
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 import "./EmpyreanDashboardLayout.css";
 
 // Sample Data for Recharts
@@ -94,6 +96,47 @@ function MenuItem({ icon: Icon, text, danger }) {
     <button className={`menu-item ${danger ? "menu-item--danger" : ""}`}>
       <Icon size={16} strokeWidth={1.8} /> {text}
     </button>
+  );
+}
+
+function MapContent() {
+  const center = [12.9716, 77.5946];
+  return (
+    <div className="map-wrapper" style={{ height: "100%", width: "100%", borderRadius: "24px", overflow: "hidden", border: "1px solid var(--border-color)", zIndex: 0 }}>
+      <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%", zIndex: 1 }}>
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; CARTO'
+        />
+        <CircleMarker center={[12.9716, 77.5946]} radius={20} pathOptions={{ color: '#ff6b6b', fillColor: '#ff6b6b', fillOpacity: 0.4 }}>
+          <Popup>
+            <div style={{ color: '#333' }}>
+              <strong>Device: WQM_001</strong><br />
+              AQI: 145 (Unhealthy)<br />
+              PM2.5: 55 &mu;g/m&sup3;
+            </div>
+          </Popup>
+        </CircleMarker>
+        <CircleMarker center={[12.9650, 77.6000]} radius={15} pathOptions={{ color: '#fbbf24', fillColor: '#fbbf24', fillOpacity: 0.4 }}>
+          <Popup>
+            <div style={{ color: '#333' }}>
+              <strong>Device: WQM_002</strong><br />
+              AQI: 85 (Moderate)<br />
+              PM2.5: 22 &mu;g/m&sup3;
+            </div>
+          </Popup>
+        </CircleMarker>
+        <CircleMarker center={[12.9800, 77.5800]} radius={15} pathOptions={{ color: '#4cdbaf', fillColor: '#4cdbaf', fillOpacity: 0.4 }}>
+          <Popup>
+            <div style={{ color: '#333' }}>
+              <strong>Device: WQM_003</strong><br />
+              AQI: 40 (Good)<br />
+              PM2.5: 10 &mu;g/m&sup3;
+            </div>
+          </Popup>
+        </CircleMarker>
+      </MapContainer>
+    </div>
   );
 }
 
@@ -219,7 +262,8 @@ export default function EmpyreanDashboardLayout() {
 
         <main className="main">
           {activeTab === "overview" && <OverviewContent />}
-          {activeTab !== "overview" && (
+          {activeTab === "map" && <MapContent />}
+          {activeTab !== "overview" && activeTab !== "map" && (
             <div className="main__placeholder">
               {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} functionality coming soon!
             </div>

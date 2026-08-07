@@ -63,16 +63,6 @@ export default function LoginPage({
 
     setErrors(newErrors);
 
-<<<<<<< HEAD
-    if (Object.keys(newErrors).length === 0) {
-      console.log("Login attempted with:", formData);
-      if (typeof onLoginSuccess === "function") {
-        onLoginSuccess();
-      }
-    } else {
-      if (newErrors.username) usernameRef.current?.focus();
-      else if (newErrors.password) passwordRef.current?.focus();
-=======
     if (Object.keys(newErrors).length) {
       const firstErrorField = Object.keys(newErrors)[0];
       if (firstErrorField === "username") {
@@ -81,10 +71,12 @@ export default function LoginPage({
         passwordRef.current?.focus();
       }
       return;
->>>>>>> 19429265af5aa3489f2b60698742f0631a5fa10d
     }
 
     console.log("Login submitted", formData);
+    if (typeof onLoginSuccess === "function") {
+      onLoginSuccess();
+    }
   };
 
   return (
