@@ -8,6 +8,7 @@ const FIELD_LABELS = {
 };
 
 export default function LoginPage({
+  onLoginSuccess,
   onSwitchToRegister,
   onSwitchToForgotPassword,
   onSwitchToAbout,
@@ -73,6 +74,9 @@ export default function LoginPage({
     }
 
     console.log("Login submitted", formData);
+    if (typeof onLoginSuccess === "function") {
+      onLoginSuccess();
+    }
   };
 
   return (

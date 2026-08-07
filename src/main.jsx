@@ -10,6 +10,7 @@ import "./index.css";
 
 import AboutPage from "./pages/About";
 import FeaturesPage from "./pages/Features";
+import EmpyreanDashboardLayout from "./pages/dashboard";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("landing");
@@ -46,13 +47,7 @@ function App() {
       break;
 
     case "dashboard":
-      // Placeholder until DashboardLayout is built
-      pageEl = (
-        <div style={{ padding: "2rem", textAlign: "center", color: "white" }}>
-          <h1>Dashboard (coming soon)</h1>
-          <button onClick={() => navigate("login")}>Logout</button>
-        </div>
-      );
+      pageEl = <EmpyreanDashboardLayout />;
       break;
 
     case "forgot-password":
@@ -90,6 +85,7 @@ function App() {
         />
       );
   }
+
 
   return (
     <>
