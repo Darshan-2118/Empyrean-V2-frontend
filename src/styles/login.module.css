@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Aboreto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Aboreto&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Gugi&family=Aboreto&display=swap');
 
 .pageContainer {
@@ -56,7 +56,8 @@
 .glassCard {
   display: flex;
   width: 900px;
-  height: 550px;
+  min-height: 600px;
+  height: auto;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -183,7 +184,7 @@
 .welcomeText {
   font-size: 2rem;
   font-weight: 400;
-  margin: 0 0 0.5rem 0;
+  margin: 1.5rem 0 0.5rem 0;
   text-align: center;
   letter-spacing: 1px;
 }
@@ -265,6 +266,7 @@
   display: flex;
   justify-content: space-between;
   margin-top: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .footerLinks a {
@@ -289,12 +291,10 @@
 
 /* A bit taller than the base card so the login error slots fit without overflow */
 .loginCard {
-  height: 650px;
 }
 
 /* Taller still for the 3 forgot-password fields + error slots */
 .forgotCard {
-  height: 650px;
 }
 
 /* Slightly tighter form spacing for the extra field */

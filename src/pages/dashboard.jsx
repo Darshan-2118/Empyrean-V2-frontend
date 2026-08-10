@@ -67,7 +67,7 @@ function AqiTickerSpace() {
   );
 }
 
-function ProfileMenu() {
+function ProfileMenu({ onNavigate }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   useEffect(() => {
@@ -93,7 +93,7 @@ function ProfileMenu() {
             <p className="dropdown__subtitle">Asthma Profile Active</p>
           </div>
           <MenuItem icon={Users} text="Switch Profile" />
-          <MenuItem icon={Settings} text="Account settings" />
+          <MenuItem icon={Settings} text="Account settings" onClick={() => { setOpen(false); onNavigate && onNavigate("account-settings"); }} />
           <MenuItem icon={LogOut} text="Sign out" danger />
         </div>
       )}
@@ -101,9 +101,9 @@ function ProfileMenu() {
   );
 }
 
-function MenuItem({ icon: Icon, text, danger }) {
+function MenuItem({ icon: Icon, text, danger, onClick }) {
   return (
-    <button className={`menu-item ${danger ? "menu-item--danger" : ""}`}>
+    <button className={`menu-item ${danger ? "menu-item--danger" : ""}`} onClick={onClick}>
       <Icon size={16} strokeWidth={1.8} /> {text}
     </button>
   );
@@ -434,7 +434,7 @@ function OverviewContent() {
   );
 }
 
-export default function EmpyreanDashboardLayout() {
+export default function EmpyreanDashboardLayout({ onNavigate }) {
   const [activeTab, setActiveTab] = useState("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -450,7 +450,7 @@ export default function EmpyreanDashboardLayout() {
           <input type="text" placeholder="Search areas, devices, alerts" className="search__input" />
         </div>
         <Tooltip label="Notifications"><button className="icon-btn"><Bell size={19} strokeWidth={1.8} /><span className="icon-btn__dot" /></button></Tooltip>
-        <ProfileMenu />
+        <ProfileMenu onNavigate={onNavigate} />
       </header>
 
       <div className="dashboard__body">
