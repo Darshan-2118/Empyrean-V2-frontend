@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import styles from "../styles/login.module.css";
 import logoGraphic from "../assets/landing/final-logo.svg";
+import { register } from "../api.js";
 
 const FIELD_LABELS = {
   name: "Full Name",
@@ -24,6 +25,8 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
   });
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
+  const [formError, setFormError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const nameRef = useRef(null);
   const usernameRef = useRef(null);
   const emailRef = useRef(null);
@@ -122,7 +125,7 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const newErrors = {};
@@ -149,10 +152,29 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
       return;
     }
 
-    setMessage("Registration successful!");
-
-    if (typeof onRegisterSuccess === "function") {
-      onRegisterSuccess();
+    setMessage("");
+    setFormError("");
+    setSubmitting(true);
+    try {
+      // Backend accepts only username/email/password and auto-logs-in.
+      const data = await register({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+      });
+      setMessage("Registration successful!");
+      if (typeof onRegisterSuccess === "function") {
+        onRegisterSuccess(data && data.role);
+      }
+    } catch (err) {
+      setMessage("");
+      setFormError(
+        err && err.message
+          ? err.message
+          : "Unable to create your account — please try again."
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -295,8 +317,14 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
                   </span>
                 </div>
 
-                <button type="submit" className={styles.loginButton}>
-                  Register
+                {formError ? (
+                  <p role="alert" className={styles.formError}>
+                    {formError}
+                  </p>
+                ) : null}
+
+                <button type="submit" className={styles.loginButton} disabled={submitting}>
+                  {submitting ? "Creating account…" : "Register"}
                 </button>
 
                 <p className={styles.helperText}>
