@@ -118,16 +118,25 @@ function Tooltip({ label, children, position = "bottom" }) {
   );
 }
 
-function IconRailButton({ icon: Icon, label, active, onClick }) {
+function IconRailButton({ icon: Icon, label, active, onClick, isOpen }) {
+  const content = (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      className={`rail-btn ${active ? "rail-btn--active" : ""} ${isOpen ? "rail-btn--open" : ""}`}
+    >
+      <Icon size={20} strokeWidth={1.8} />
+      {isOpen && <span className="rail-btn__text">{label}</span>}
+    </button>
+  );
+
+  if (isOpen) {
+    return content;
+  }
+
   return (
     <Tooltip label={label} position="right">
-      <button
-        onClick={onClick}
-        aria-label={label}
-        className={`rail-btn ${active ? "rail-btn--active" : ""}`}
-      >
-        <Icon size={20} strokeWidth={1.8} />
-      </button>
+      {content}
     </Tooltip>
   );
 }
@@ -772,17 +781,18 @@ export default function EmpyreanDashboardLayout({ onLogout }) {
       </header>
 
       <div className="dashboard__body">
-        <aside className="rail">
+        <aside className={`rail ${isSidebarOpen ? 'rail--open' : ''}`}>
+
           <nav className="rail__nav">
-            <IconRailButton icon={LayoutDashboard} label="Overview" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
-            <IconRailButton icon={MapIcon} label="Map (Geo-Visualisation)" active={activeTab === 'map'} onClick={() => setActiveTab('map')} />
-            <IconRailButton icon={BarChart3} label="Analytics" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
+            <IconRailButton isOpen={isSidebarOpen} icon={LayoutDashboard} label="Overview" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
+            <IconRailButton isOpen={isSidebarOpen} icon={MapIcon} label="Geo-Map" active={activeTab === 'map'} onClick={() => setActiveTab('map')} />
+            <IconRailButton isOpen={isSidebarOpen} icon={BarChart3} label="Analytics" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
           </nav>
           <div className="rail__spacer" />
           <div className="rail__bottom">
-            <IconRailButton icon={Cpu} label="Devices" active={activeTab === 'devices'} onClick={() => setActiveTab('devices')} />
+            <IconRailButton isOpen={isSidebarOpen} icon={Cpu} label="Devices" active={activeTab === 'devices'} onClick={() => setActiveTab('devices')} />
             <div className="rail__divider" />
-            <IconRailButton icon={Settings} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
+            <IconRailButton isOpen={isSidebarOpen} icon={Settings} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
           </div>
         </aside>
 

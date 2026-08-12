@@ -128,7 +128,7 @@ export default function ForgotPasswordPage({ onResetSuccess, onSwitchToLogin, on
       <div className={styles.mainContainer}>
         <div className={`${styles.glassCard} ${styles.forgotCard}`}>
           {/* Form fields on the LEFT */}
-          <div className={`${styles.formPanel} ${styles.formSlide}`}>
+          <div className={styles.formPanel}>
             <div className={styles.loginFormContainer}>
               <h2 className={styles.welcomeText}>Reset Password</h2>
               <p className={styles.subtitleText}>
@@ -218,7 +218,7 @@ export default function ForgotPasswordPage({ onResetSuccess, onSwitchToLogin, on
           </div>
 
           {/* Empyrean logo on the RIGHT */}
-          <div className={`${styles.brandPanel} ${styles.brandSlide}`}>
+          <div className={styles.brandPanel}>
             {/* Glowing Blobs from Figma */}
             <div className={styles.glowBlob1}></div>
             <div className={styles.glowBlob2}></div>

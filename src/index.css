@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Also hide the webkit scrollbar just in case something inside scrolls */
+::-webkit-scrollbar {
+  display: none;
+}
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
