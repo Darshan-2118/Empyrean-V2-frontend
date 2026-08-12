@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import {
   Wind, Search, Bell, ChevronDown, User, Users, LogOut, Settings, Cpu,
   LayoutDashboard, Map as MapIcon, BarChart3, Activity, AlertTriangle, CheckCircle,
-  Battery, MapPin, RefreshCw, Plus, Wifi
+  Battery, MapPin, RefreshCw, Plus, Wifi, Menu
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from "react-leaflet";
@@ -29,16 +29,25 @@ function Tooltip({ label, children, position = "bottom" }) {
   );
 }
 
-function IconRailButton({ icon: Icon, label, active, onClick }) {
+function IconRailButton({ icon: Icon, label, active, onClick, isOpen }) {
+  const content = (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      className={`rail-btn ${active ? "rail-btn--active" : ""} ${isOpen ? "rail-btn--open" : ""}`}
+    >
+      <Icon size={20} strokeWidth={1.8} />
+      {isOpen && <span className="rail-btn__text">{label}</span>}
+    </button>
+  );
+
+  if (isOpen) {
+    return content;
+  }
+
   return (
     <Tooltip label={label} position="right">
-      <button
-        onClick={onClick}
-        aria-label={label}
-        className={`rail-btn ${active ? "rail-btn--active" : ""}`}
-      >
-        <Icon size={20} strokeWidth={1.8} />
-      </button>
+      {content}
     </Tooltip>
   );
 }
@@ -58,7 +67,7 @@ function AqiTickerSpace() {
   );
 }
 
-function ProfileMenu() {
+function ProfileMenu({ onNavigate }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   useEffect(() => {
@@ -84,7 +93,7 @@ function ProfileMenu() {
             <p className="dropdown__subtitle">Asthma Profile Active</p>
           </div>
           <MenuItem icon={Users} text="Switch Profile" />
-          <MenuItem icon={Settings} text="Account settings" />
+          <MenuItem icon={Settings} text="Account settings" onClick={() => { setOpen(false); onNavigate && onNavigate("account-settings"); }} />
           <MenuItem icon={LogOut} text="Sign out" danger />
         </div>
       )}
@@ -92,9 +101,9 @@ function ProfileMenu() {
   );
 }
 
-function MenuItem({ icon: Icon, text, danger }) {
+function MenuItem({ icon: Icon, text, danger, onClick }) {
   return (
-    <button className={`menu-item ${danger ? "menu-item--danger" : ""}`}>
+    <button className={`menu-item ${danger ? "menu-item--danger" : ""}`} onClick={onClick}>
       <Icon size={16} strokeWidth={1.8} /> {text}
     </button>
   );
@@ -425,37 +434,38 @@ function OverviewContent() {
   );
 }
 
-export default function EmpyreanDashboardLayout() {
+export default function EmpyreanDashboardLayout({ onNavigate }) {
   const [activeTab, setActiveTab] = useState("overview");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="dashboard">
       <header className="dashboard__header">
-        <div className="dashboard__logo">
-          <div className="dashboard__logo-mark"><Wind size={18} color="#fff" strokeWidth={2} /></div>
-          <span className="dashboard__logo-text">Empyrean</span>
-        </div>
+        <button className="icon-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+          <Menu size={24} strokeWidth={1.8} />
+        </button>
         <AqiTickerSpace />
         <div className="search">
           <Search size={16} color="rgba(255,255,255,0.7)" />
           <input type="text" placeholder="Search areas, devices, alerts" className="search__input" />
         </div>
         <Tooltip label="Notifications"><button className="icon-btn"><Bell size={19} strokeWidth={1.8} /><span className="icon-btn__dot" /></button></Tooltip>
-        <ProfileMenu />
+        <ProfileMenu onNavigate={onNavigate} />
       </header>
 
       <div className="dashboard__body">
-        <aside className="rail">
+        <aside className={`rail ${isSidebarOpen ? 'rail--open' : ''}`}>
+
           <nav className="rail__nav">
-            <IconRailButton icon={LayoutDashboard} label="Overview" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
-            <IconRailButton icon={MapIcon} label="Map (Geo-Visualisation)" active={activeTab === 'map'} onClick={() => setActiveTab('map')} />
-            <IconRailButton icon={BarChart3} label="Analytics" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
+            <IconRailButton isOpen={isSidebarOpen} icon={LayoutDashboard} label="Overview" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
+            <IconRailButton isOpen={isSidebarOpen} icon={MapIcon} label="Geo-Map" active={activeTab === 'map'} onClick={() => setActiveTab('map')} />
+            <IconRailButton isOpen={isSidebarOpen} icon={BarChart3} label="Analytics" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
           </nav>
           <div className="rail__spacer" />
           <div className="rail__bottom">
-            <IconRailButton icon={Cpu} label="Devices" active={activeTab === 'devices'} onClick={() => setActiveTab('devices')} />
+            <IconRailButton isOpen={isSidebarOpen} icon={Cpu} label="Devices" active={activeTab === 'devices'} onClick={() => setActiveTab('devices')} />
             <div className="rail__divider" />
-            <IconRailButton icon={Settings} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
+            <IconRailButton isOpen={isSidebarOpen} icon={Settings} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
           </div>
         </aside>
 

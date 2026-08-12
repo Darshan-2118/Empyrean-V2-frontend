@@ -11,6 +11,7 @@ import "./index.css";
 import AboutPage from "./pages/About";
 import FeaturesPage from "./pages/Features";
 import EmpyreanDashboardLayout from "./pages/dashboard";
+import AccountSettingsPage from "./pages/AccountSettings";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("landing");
@@ -47,7 +48,11 @@ function App() {
       break;
 
     case "dashboard":
-      pageEl = <EmpyreanDashboardLayout />;
+      pageEl = <EmpyreanDashboardLayout onNavigate={navigate} />;
+      break;
+
+    case "account-settings":
+      pageEl = <AccountSettingsPage onBack={() => navigate("dashboard")} />;
       break;
 
     case "forgot-password":
