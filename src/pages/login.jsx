@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import styles from "../styles/login.module.css";
 import logoGraphic from "../assets/landing/final-logo.svg";
+import { login } from "../api.js";
 
 const FIELD_LABELS = {
   username: "Email or username",
@@ -19,6 +20,8 @@ export default function LoginPage({
     password: "",
   });
   const [errors, setErrors] = useState({});
+  const [formError, setFormError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const usernameRef = useRef(null);
   const passwordRef = useRef(null);
 
@@ -51,7 +54,7 @@ export default function LoginPage({
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = {};
@@ -73,9 +76,21 @@ export default function LoginPage({
       return;
     }
 
-    console.log("Login submitted", formData);
-    if (typeof onLoginSuccess === "function") {
-      onLoginSuccess();
+    setFormError("");
+    setSubmitting(true);
+    try {
+      const data = await login({ username: formData.username, password: formData.password });
+      if (typeof onLoginSuccess === "function") {
+        onLoginSuccess(data && data.role);
+      }
+    } catch (err) {
+      setErrors({});
+      setFormError(
+        err && err.message ? err.message : "Unable to sign in — please try again."
+      );
+      if (err && err.status === 401) passwordRef.current?.focus();
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -141,8 +156,14 @@ export default function LoginPage({
                   <span className={styles.fieldError}>{errors.password}</span>
                 </div>
 
-                <button type="submit" className={styles.loginButton}>
-                  Login
+                {formError ? (
+                  <p role="alert" className={styles.formError}>
+                    {formError}
+                  </p>
+                ) : null}
+
+                <button type="submit" className={styles.loginButton} disabled={submitting}>
+                  {submitting ? "Signing in…" : "Login"}
                 </button>
 
                 <div className={styles.footerLinks}>
