@@ -399,6 +399,19 @@
   text-overflow: ellipsis;
 }
 
+/* Form-level error (e.g. invalid credentials or network failure) */
+.formError {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  border-radius: 8px;
+  background: rgba(255, 107, 107, 0.12);
+  color: #ff8f8f;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  text-align: left;
+}
+
 /* Stop the browser's autofill from painting inputs as white boxes */
 .inputGroup input:-webkit-autofill,
 .inputGroup input:-webkit-autofill:hover,
