@@ -43,6 +43,7 @@ export default function Navbar({ active, onNavigate }) {
               className={styles.disabled}
               aria-disabled="true"
               role="link"
+              onClick={(e) => e.preventDefault()}
             >
               {item.label}
             </a>

@@ -1,24 +1,99 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Wind, Search, Bell, ChevronDown, User, Users, LogOut, Settings, Cpu,
   LayoutDashboard, Map as MapIcon, BarChart3, Activity, AlertTriangle, CheckCircle,
-  Battery, MapPin, RefreshCw, Plus, Wifi
+  Battery, MapPin, RefreshCw, Plus
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
-import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from "react-leaflet";
+import { MapContainer, TileLayer, Popup, CircleMarker, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import {
+  getLatestReadings, getReadingsHistory, getNodes, getAlerts,
+  acknowledgeAlert, getProfile, updateProfile, logout, connectAlertsSocket,
+  ApiError, getErrorMessage,
+} from "../api";
 import "./EmpyreanDashboardLayout.css";
 
-// Sample Data for Recharts
-const mockChartData = [
-  { time: '08:00', pm25: 12 },
-  { time: '09:00', pm25: 15 },
-  { time: '10:00', pm25: 25 },
-  { time: '11:00', pm25: 45 },
-  { time: '12:00', pm25: 30 },
-  { time: '13:00', pm25: 18 },
-  { time: '14:00', pm25: 22 },
-];
+const DEFAULT_CENTER = [12.9716, 77.5946];
+
+function fmtTime(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function timeAgo(iso) {
+  if (!iso) return "never";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "unknown";
+  const secs = Math.max(0, Math.round((Date.now() - d.getTime()) / 1000));
+  if (secs < 60) return `${secs} seconds ago`;
+  const mins = Math.round(secs / 60);
+  if (mins < 60) return `${mins} minute${mins === 1 ? "" : "s"} ago`;
+  const hours = Math.round(mins / 60);
+  return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+}
+
+function parseLocation(node) {
+  const loc = node?.location ?? node?.coordinates;
+  if (!loc) return null;
+  if (typeof loc === "string") {
+    const [lat, lng] = loc.split(",").map((v) => Number(v.trim()));
+    return Number.isFinite(lat) && Number.isFinite(lng) ? [lat, lng] : null;
+  }
+  if (Array.isArray(loc)) {
+    const [lat, lng] = loc;
+    return Number.isFinite(lat) && Number.isFinite(lng) ? [lat, lng] : null;
+  }
+  if (typeof loc === "object") {
+    if (Array.isArray(loc.coordinates)) {
+      const [lng, lat] = loc.coordinates;
+      if (Number.isFinite(lat) && Number.isFinite(lng)) return [lat, lng];
+    }
+    const lat = Number(loc.latitude ?? loc.lat);
+    const lng = Number(loc.longitude ?? loc.lng ?? loc.lon);
+    return Number.isFinite(lat) && Number.isFinite(lng) ? [lat, lng] : null;
+  }
+  return null;
+}
+
+function aqiColor(aqi) {
+  if (aqi == null) return "#4cdbaf";
+  if (aqi <= 50) return "#4cdbaf";
+  if (aqi <= 100) return "#fbbf24";
+  return "#ff6b6b";
+}
+
+function nodeIdOf(node) {
+  return node?.node_id ?? node?.id;
+}
+
+function Toast({ toast }) {
+  if (!toast) return null;
+  return (
+    <div
+      role="status"
+      style={{
+        position: "fixed",
+        bottom: "24px",
+        right: "24px",
+        zIndex: 1000,
+        background: "rgba(10, 31, 31, 0.95)",
+        border: "1px solid var(--border-color)",
+        borderLeft: `3px solid ${toast.kind === "error" ? "#ff6b6b" : "#4cdbaf"}`,
+        color: "#fff",
+        padding: "12px 16px",
+        borderRadius: "12px",
+        fontSize: "0.85rem",
+        maxWidth: "320px",
+        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+      }}
+    >
+      {toast.message}
+    </div>
+  );
+}
 
 function Tooltip({ label, children, position = "bottom" }) {
   return (
@@ -43,13 +118,18 @@ function IconRailButton({ icon: Icon, label, active, onClick }) {
   );
 }
 
-function AqiTickerSpace() {
+function AqiTickerSpace({ reading, nodeId, backendDown }) {
   const placeholders = new Array(6).fill(0);
+  const label = backendDown
+    ? "Live data unavailable — check the server"
+    : reading && reading.aqi != null
+      ? `${nodeId} · AQI: ${reading.aqi} (${reading.aqi_category ?? "Unknown"})`
+      : "Waiting for live data…";
   return (
     <div className="ticker">
       <div className="ticker__gradient" />
       <div className="ticker__content">
-        <span className="ticker__label">Bengaluru · AQI: 85 (Moderate)</span>
+        <span className="ticker__label">{label}</span>
         {placeholders.map((_, i) => (
           <span key={i} className="ticker__chip" />
         ))}
@@ -58,7 +138,7 @@ function AqiTickerSpace() {
   );
 }
 
-function ProfileMenu() {
+function ProfileMenu({ user, onSignOut, onSettings }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   useEffect(() => {
@@ -80,28 +160,41 @@ function ProfileMenu() {
       {open && (
         <div className="dropdown">
           <div className="dropdown__header">
-            <p className="dropdown__title">Signed in</p>
-            <p className="dropdown__subtitle">Asthma Profile Active</p>
+            <p className="dropdown__title">{user?.username || "Signed in"}</p>
+            <p className="dropdown__subtitle">{user?.email || ""}</p>
           </div>
           <MenuItem icon={Users} text="Switch Profile" />
-          <MenuItem icon={Settings} text="Account settings" />
-          <MenuItem icon={LogOut} text="Sign out" danger />
+          <MenuItem icon={Settings} text="Account settings" onClick={() => { setOpen(false); onSettings?.(); }} />
+          <MenuItem icon={LogOut} text="Sign out" danger onClick={() => { setOpen(false); onSignOut?.(); }} />
         </div>
       )}
     </div>
   );
 }
 
-function MenuItem({ icon: Icon, text, danger }) {
+function MenuItem({ icon: Icon, text, danger, onClick }) {
   return (
-    <button className={`menu-item ${danger ? "menu-item--danger" : ""}`}>
+    <button onClick={onClick} className={`menu-item ${danger ? "menu-item--danger" : ""}`}>
       <Icon size={16} strokeWidth={1.8} /> {text}
     </button>
   );
 }
 
-function MapContent() {
-  const center = [12.9716, 77.5946];
+function Recenter({ center }) {
+  const map = useMap();
+  const [lat, lng] = center;
+  useEffect(() => {
+    map.setView([lat, lng]);
+  }, [map, lat, lng]);
+  return null;
+}
+
+function MapContent({ nodes, latest }) {
+  const markers = nodes
+    .map((node) => ({ node, position: parseLocation(node) }))
+    .filter((m) => m.position);
+  const center = markers.length ? markers[0].position : DEFAULT_CENTER;
+
   return (
     <div className="map-wrapper" style={{ height: "100%", width: "100%", borderRadius: "24px", overflow: "hidden", border: "1px solid var(--border-color)", zIndex: 0 }}>
       <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%", zIndex: 1 }}>
@@ -109,47 +202,44 @@ function MapContent() {
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
           attribution='&copy; CARTO'
         />
-        <CircleMarker center={[12.9716, 77.5946]} radius={20} pathOptions={{ color: '#ff6b6b', fillColor: '#ff6b6b', fillOpacity: 0.4 }}>
-          <Popup>
-            <div style={{ color: '#333' }}>
-              <strong>Device: WQM_001</strong><br />
-              AQI: 145 (Unhealthy)<br />
-              PM2.5: 55 &mu;g/m&sup3;
-            </div>
-          </Popup>
-        </CircleMarker>
-        <CircleMarker center={[12.9650, 77.6000]} radius={15} pathOptions={{ color: '#fbbf24', fillColor: '#fbbf24', fillOpacity: 0.4 }}>
-          <Popup>
-            <div style={{ color: '#333' }}>
-              <strong>Device: WQM_002</strong><br />
-              AQI: 85 (Moderate)<br />
-              PM2.5: 22 &mu;g/m&sup3;
-            </div>
-          </Popup>
-        </CircleMarker>
-        <CircleMarker center={[12.9800, 77.5800]} radius={15} pathOptions={{ color: '#4cdbaf', fillColor: '#4cdbaf', fillOpacity: 0.4 }}>
-          <Popup>
-            <div style={{ color: '#333' }}>
-              <strong>Device: WQM_003</strong><br />
-              AQI: 40 (Good)<br />
-              PM2.5: 10 &mu;g/m&sup3;
-            </div>
-          </Popup>
-        </CircleMarker>
+        <Recenter center={center} />
+        {markers.map(({ node, position }, index) => {
+          const id = nodeIdOf(node);
+          const reading = latest[id];
+          const color = aqiColor(reading?.aqi);
+          return (
+            <CircleMarker key={id ?? index} center={position} radius={15} pathOptions={{ color, fillColor: color, fillOpacity: 0.4 }}>
+              <Popup>
+                <div style={{ color: '#333' }}>
+                  <strong>Device: {node?.name || id}</strong><br />
+                  AQI: {reading?.aqi != null ? `${reading.aqi} (${reading.aqi_category ?? "Unknown"})` : "No data"}<br />
+                  PM2.5: {reading?.pm25 != null ? `${reading.pm25} µg/m³` : "—"}
+                </div>
+              </Popup>
+            </CircleMarker>
+          );
+        })}
       </MapContainer>
     </div>
   );
 }
 
-function AnalyticsContent() {
-  const detailedChartData = [
-    { time: '00:00', pm25: 15, pm10: 20, co2: 400 },
-    { time: '04:00', pm25: 12, pm10: 18, co2: 390 },
-    { time: '08:00', pm25: 35, pm10: 45, co2: 450 },
-    { time: '12:00', pm25: 55, pm10: 70, co2: 520 },
-    { time: '16:00', pm25: 45, pm10: 60, co2: 480 },
-    { time: '20:00', pm25: 25, pm10: 35, co2: 420 },
-  ];
+function AnalyticsContent({ history }) {
+  const detailedChartData = history.map((b) => ({
+    time: fmtTime(b.bucket),
+    pm25: b.avg_pm25,
+    pm10: b.avg_pm10,
+    aqi: b.avg_aqi,
+  }));
+
+  const avgPm25 = history.length
+    ? (history.reduce((sum, b) => sum + (b.avg_pm25 || 0), 0) / history.length).toFixed(1)
+    : null;
+  const peakBucket = history.reduce(
+    (best, b) => ((b.max_aqi || 0) > (best?.max_aqi || 0) ? b : best),
+    null,
+  );
+  const safeHours = history.filter((b) => (b.max_aqi ?? 0) <= 100).length;
 
   return (
     <div className="analytics-grid">
@@ -170,7 +260,7 @@ function AnalyticsContent() {
               />
               <Line yAxisId="left" type="monotone" name="PM2.5 (µg/m³)" dataKey="pm25" stroke="#ff6b6b" strokeWidth={3} dot={{ r: 4 }} />
               <Line yAxisId="left" type="monotone" name="PM10 (µg/m³)" dataKey="pm10" stroke="#fbbf24" strokeWidth={3} dot={{ r: 4 }} />
-              <Line yAxisId="right" type="monotone" name="CO2 (ppm)" dataKey="co2" stroke="#4cdbaf" strokeWidth={3} dot={{ r: 4 }} />
+              <Line yAxisId="right" type="monotone" name="AQI" dataKey="aqi" stroke="#4cdbaf" strokeWidth={3} dot={{ r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -182,19 +272,21 @@ function AnalyticsContent() {
         </div>
         <div className="widget__body">
           <p className="profile-desc" style={{ marginBottom: '24px' }}>
-            Your highest exposure occurred at 12:00 PM (Moderate Risk).
+            {peakBucket && peakBucket.max_aqi != null
+              ? `Your highest exposure occurred at ${fmtTime(peakBucket.bucket)} (AQI ${peakBucket.max_aqi}).`
+              : "No exposure data in the last 24 hours."}
           </p>
           <div className="stat-row">
             <span className="stat-label">Avg PM2.5:</span> 
-            <span className="stat-val">31 µg/m³</span>
+            <span className="stat-val">{avgPm25 != null ? `${avgPm25} µg/m³` : "—"}</span>
           </div>
           <div className="stat-row">
-            <span className="stat-label">Peak PM10:</span> 
-            <span className="stat-val" style={{ color: '#fbbf24' }}>70 µg/m³</span>
+            <span className="stat-label">Peak AQI:</span> 
+            <span className="stat-val" style={{ color: '#fbbf24' }}>{peakBucket?.max_aqi != null ? peakBucket.max_aqi : "—"}</span>
           </div>
           <div className="stat-row" style={{ borderBottom: 'none' }}>
             <span className="stat-label">Safe Hours:</span> 
-            <span className="stat-val" style={{ color: '#4cdbaf' }}>14 hours</span>
+            <span className="stat-val" style={{ color: '#4cdbaf' }}>{safeHours} hours</span>
           </div>
         </div>
       </div>
@@ -202,67 +294,77 @@ function AnalyticsContent() {
   );
 }
 
-function DevicesContent() {
+function DevicesContent({ nodes, latest }) {
   return (
     <div className="devices-grid">
       <div className="widget widget--full" style={{ padding: '0', overflow: 'hidden' }}>
         <div className="widget__header" style={{ padding: '24px 24px 0 24px' }}>
           <h3>Paired Devices</h3>
-          <button className="add-btn" style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--accent-color)', color: '#08201a', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}>
+          <button className="add-btn" style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--accent-color)', color: '#08201a', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>
             <Plus size={16} /> Add Device
           </button>
         </div>
         <div className="device-list" style={{ padding: '24px' }}>
-          <div className="device-card">
-            <div className="device-card__header">
-              <div className="device-info">
-                <h4>Wearable AQI Monitor (WQM_001)</h4>
-                <span className="device-status device-status--online">
-                  <span className="status-dot"></span> Online
-                </span>
+          {nodes.length === 0 && (
+            <p className="profile-desc">No sensor nodes registered yet.</p>
+          )}
+          {nodes.map((node, index) => {
+            const id = nodeIdOf(node);
+            const reading = latest[id];
+            const online = node.is_active !== false;
+            return (
+              <div className="device-card" key={id ?? index}>
+                <div className="device-card__header">
+                  <div className="device-info">
+                    <h4>{node.name || id} ({id})</h4>
+                    <span className={`device-status ${online ? "device-status--online" : ""}`}>
+                      <span className="status-dot"></span> {online ? "Online" : "Inactive"}
+                    </span>
+                  </div>
+                  <div className="device-battery">
+                    <Battery size={20} className="text-accent" />
+                    <span>{reading?.battery_v != null ? `${reading.battery_v}V` : "—"}</span>
+                  </div>
+                </div>
+                
+                <div className="device-diagnostics">
+                  <div className="diag-item">
+                    <Cpu size={16} style={{ color: 'var(--text-secondary)' }} />
+                    <span>Node ID</span>
+                    <strong style={{ color: 'var(--safe-color)' }}>{id}</strong>
+                  </div>
+                  <div className="diag-item">
+                    <Wind size={16} style={{ color: 'var(--text-secondary)' }} />
+                    <span>AQI</span>
+                    <strong style={{ color: 'var(--safe-color)' }}>{reading?.aqi != null ? `${reading.aqi} (${reading.aqi_category ?? "Unknown"})` : "—"}</strong>
+                  </div>
+                  <div className="diag-item">
+                    <Activity size={16} style={{ color: 'var(--text-secondary)' }} />
+                    <span>PM2.5</span>
+                    <strong style={{ color: 'var(--safe-color)' }}>{reading?.pm25 != null ? `${reading.pm25} µg/m³` : "—"}</strong>
+                  </div>
+                  <div className="diag-item">
+                    <MapPin size={16} style={{ color: 'var(--text-secondary)' }} />
+                    <span>Location</span>
+                    <strong style={{ color: 'var(--warning-color)' }}>{typeof node.location === "string" && node.location ? node.location : (parseLocation(node) ? parseLocation(node).join(", ") : "—")}</strong>
+                  </div>
+                </div>
+                
+                <div className="device-footer">
+                  <span className="sync-time"><RefreshCw size={14} /> Last sync: {reading?.time ? timeAgo(reading.time) : "never"} via MQTT</span>
+                  <button className="manage-btn">Manage Settings</button>
+                </div>
               </div>
-              <div className="device-battery">
-                <Battery size={20} className="text-accent" />
-                <span>78%</span>
-              </div>
-            </div>
-            
-            <div className="device-diagnostics">
-              <div className="diag-item">
-                <Cpu size={16} style={{ color: 'var(--text-secondary)' }} />
-                <span>ESP32 Core</span>
-                <strong style={{ color: 'var(--safe-color)' }}>Active</strong>
-              </div>
-              <div className="diag-item">
-                <Wind size={16} style={{ color: 'var(--text-secondary)' }} />
-                <span>MQ135 (Gas)</span>
-                <strong style={{ color: 'var(--safe-color)' }}>Calibrated</strong>
-              </div>
-              <div className="diag-item">
-                <Activity size={16} style={{ color: 'var(--text-secondary)' }} />
-                <span>PMS5003 (PM)</span>
-                <strong style={{ color: 'var(--safe-color)' }}>Reading</strong>
-              </div>
-              <div className="diag-item">
-                <MapPin size={16} style={{ color: 'var(--text-secondary)' }} />
-                <span>Neo-6M GPS</span>
-                <strong style={{ color: 'var(--warning-color)' }}>3D Fix</strong>
-              </div>
-            </div>
-            
-            <div className="device-footer">
-              <span className="sync-time"><RefreshCw size={14} /> Last sync: 15 seconds ago via MQTT</span>
-              <button className="manage-btn">Manage Settings</button>
-            </div>
-          </div>
+            );
+          })}
         </div>
       </div>
     </div>
   );
 }
 
-function SettingsContent() {
-  const [activeProfile, setActiveProfile] = useState("asthma");
+function SettingsContent({ profile, onTogglePref, activeProfile, onProfileChange }) {
+  const prefs = profile?.notification_prefs || {};
 
   return (
     <div className="settings-grid">
@@ -273,15 +375,15 @@ function SettingsContent() {
         </div>
         <div className="profiles-container">
           
-          <div className={`profile-card ${activeProfile === 'asthma' ? 'profile-card--active' : ''}`} onClick={() => setActiveProfile('asthma')}>
+          <div className={`profile-card ${activeProfile === 'asthma' ? 'profile-card--active' : ''}`} onClick={() => onProfileChange('asthma')}>
             <div className="profile-card__header">
               <h4>Asthma Mode</h4>
               {activeProfile === 'asthma' && <CheckCircle size={18} className="text-accent" />}
             </div>
-            <p>For Asthma / COPD patients. High sensitivity; triggers on mild breach of PM2.5, NO&amp;#8322;, Ozone.</p>
+            <p>For Asthma / COPD patients. High sensitivity; triggers on mild breach of PM2.5, NO&#8322;, Ozone.</p>
           </div>
 
-          <div className={`profile-card ${activeProfile === 'child' ? 'profile-card--active' : ''}`} onClick={() => setActiveProfile('child')}>
+          <div className={`profile-card ${activeProfile === 'child' ? 'profile-card--active' : ''}`} onClick={() => onProfileChange('child')}>
             <div className="profile-card__header">
               <h4>Child Mode</h4>
               {activeProfile === 'child' && <CheckCircle size={18} className="text-accent" />}
@@ -289,15 +391,15 @@ function SettingsContent() {
             <p>For children under 12. Highest sensitivity; strictest limits across all pollutants.</p>
           </div>
 
-          <div className={`profile-card ${activeProfile === 'elderly' ? 'profile-card--active' : ''}`} onClick={() => setActiveProfile('elderly')}>
+          <div className={`profile-card ${activeProfile === 'elderly' ? 'profile-card--active' : ''}`} onClick={() => onProfileChange('elderly')}>
             <div className="profile-card__header">
               <h4>Elderly Mode</h4>
               {activeProfile === 'elderly' && <CheckCircle size={18} className="text-accent" />}
             </div>
-            <p>For adults over 65. Moderate sensitivity; focus on sustained exposure to PM2.5, CO&amp;#8322;, NO&amp;#8322;.</p>
+            <p>For adults over 65. Moderate sensitivity; focus on sustained exposure to PM2.5, CO&#8322;, NO&#8322;.</p>
           </div>
 
-          <div className={`profile-card ${activeProfile === 'general' ? 'profile-card--active' : ''}`} onClick={() => setActiveProfile('general')}>
+          <div className={`profile-card ${activeProfile === 'general' ? 'profile-card--active' : ''}`} onClick={() => onProfileChange('general')}>
             <div className="profile-card__header">
               <h4>General Mode</h4>
               {activeProfile === 'general' && <CheckCircle size={18} className="text-accent" />}
@@ -319,7 +421,11 @@ function SettingsContent() {
               <p>Receive alerts directly on your mobile device.</p>
             </div>
             <label className="toggle-switch">
-              <input type="checkbox" defaultChecked />
+              <input
+                type="checkbox"
+                checked={prefs.push_notifications !== false}
+                onChange={(e) => onTogglePref("push_notifications", e.target.checked)}
+              />
               <span className="slider"></span>
             </label>
           </div>
@@ -329,7 +435,11 @@ function SettingsContent() {
               <p>Receive daily exposure summary reports.</p>
             </div>
             <label className="toggle-switch">
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                checked={Boolean(prefs.email_reports)}
+                onChange={(e) => onTogglePref("email_reports", e.target.checked)}
+              />
               <span className="slider"></span>
             </label>
           </div>
@@ -340,7 +450,12 @@ function SettingsContent() {
 }
 
 // THE NEW DASHBOARD CONTENT WIDGETS
-function OverviewContent() {
+function OverviewContent({ reading, history, alerts, onAcknowledge }) {
+  const chartData = history.map((b) => ({
+    time: fmtTime(b.bucket),
+    pm25: b.avg_pm25,
+  }));
+
   return (
     <div className="overview-grid">
       {/* Widget 1: Health Profile */}
@@ -366,7 +481,7 @@ function OverviewContent() {
         </div>
         <div className="chart-container" style={{ width: '100%', height: '180px' }}>
           <ResponsiveContainer>
-            <LineChart data={mockChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <XAxis dataKey="time" stroke="rgba(255,255,255,0.5)" fontSize={12} tickLine={false} axisLine={false} />
               <YAxis stroke="rgba(255,255,255,0.5)" fontSize={12} tickLine={false} axisLine={false} />
               <RechartsTooltip 
@@ -388,19 +503,19 @@ function OverviewContent() {
         <div className="sensor-grid">
           <div className="sensor-card">
             <span className="sensor-label">PM2.5</span>
-            <span className="sensor-value">22 <small>µg/m³</small></span>
+            <span className="sensor-value">{reading?.pm25 != null ? reading.pm25 : "—"} <small>µg/m³</small></span>
           </div>
           <div className="sensor-card">
             <span className="sensor-label">PM10</span>
-            <span className="sensor-value">34 <small>µg/m³</small></span>
+            <span className="sensor-value">{reading?.pm10 != null ? reading.pm10 : "—"} <small>µg/m³</small></span>
           </div>
           <div className="sensor-card">
-            <span className="sensor-label">CO2</span>
-            <span className="sensor-value">412 <small>ppm</small></span>
+            <span className="sensor-label">AQI</span>
+            <span className="sensor-value">{reading?.aqi != null ? reading.aqi : "—"}</span>
           </div>
           <div className="sensor-card">
-            <span className="sensor-label">NH3</span>
-            <span className="sensor-value">0.8 <small>ppm</small></span>
+            <span className="sensor-label">Temp</span>
+            <span className="sensor-value">{reading?.temperature != null ? reading.temperature : "—"} <small>°C</small></span>
           </div>
         </div>
       </div>
@@ -412,36 +527,207 @@ function OverviewContent() {
           <Bell size={18} className="text-accent" />
         </div>
         <div className="alerts-feed">
-          <div className="alert-item alert-item--moderate">
-            <AlertTriangle size={18} />
-            <div>
-              <p className="alert-title">Moderate PM2.5 detected</p>
-              <span className="alert-time">11:00 AM • Recommend reducing outdoor activity</span>
+          {alerts.length === 0 ? (
+            <div className="alert-item alert-item--moderate">
+              <CheckCircle size={18} />
+              <div>
+                <p className="alert-title">No unacknowledged alerts</p>
+                <span className="alert-time">All clear</span>
+              </div>
             </div>
-          </div>
+          ) : (
+            alerts.slice(0, 4).map((alert, index) => (
+              <div
+                key={alert.id ?? alert.alert_id ?? index}
+                className="alert-item alert-item--moderate"
+                style={{ cursor: "pointer" }}
+                title="Click to acknowledge"
+                onClick={() => onAcknowledge(alert)}
+              >
+                <AlertTriangle size={18} />
+                <div>
+                  <p className="alert-title">
+                    {alert.severity === "critical" ? "Critical" : "Warning"}: {alert.message || alert.description || `Threshold breach on ${alert.node_id}`}
+                  </p>
+                  <span className="alert-time">{fmtTime(alert.created_at || alert.timestamp)} • {alert.node_id}</span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-export default function EmpyreanDashboardLayout() {
+export default function EmpyreanDashboardLayout({ user, onSignedOut }) {
   const [activeTab, setActiveTab] = useState("overview");
+  const [nodes, setNodes] = useState([]);
+  const [latest, setLatest] = useState({});
+  const [selectedNodeId, setSelectedNodeId] = useState("");
+  const [history, setHistory] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [healthProfile, setHealthProfile] = useState("asthma");
+  const [backendDown, setBackendDown] = useState(false);
+  const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
+  const historySeq = useRef(0);
+
+  const showToast = useCallback((message, kind = "error") => {
+    setToast({ message, kind });
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 5000);
+  }, []);
+
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
+
+  const loadLatest = useCallback(async () => {
+    try {
+      const data = await getLatestReadings();
+      const map = {};
+      for (const r of data?.readings || []) map[r.node_id] = r;
+      setLatest(map);
+      setBackendDown(false);
+    } catch {
+      setBackendDown(true);
+    }
+  }, []);
+
+  const loadAlerts = useCallback(async () => {
+    try {
+      const data = await getAlerts({ limit: 20 });
+      setAlerts(data?.alerts || []);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    loadLatest();
+    const id = setInterval(loadLatest, 5000);
+    return () => clearInterval(id);
+  }, [loadLatest]);
+
+  useEffect(() => {
+    loadAlerts();
+    const id = setInterval(loadAlerts, 30000);
+    return () => clearInterval(id);
+  }, [loadAlerts]);
+
+  useEffect(() => {
+    let active = true;
+    getNodes()
+      .then((data) => {
+        if (active) setNodes(Array.isArray(data) ? data : data?.nodes || []);
+      })
+      .catch((err) => {
+        if (active && err instanceof ApiError) showToast(getErrorMessage(err));
+      });
+    getProfile()
+      .then((data) => {
+        if (active) setProfile(data);
+      })
+      .catch((err) => {
+        if (active && err instanceof ApiError) showToast(getErrorMessage(err));
+      });
+    return () => {
+      active = false;
+    };
+  }, [showToast]);
+
+  useEffect(() => {
+    const socket = connectAlertsSocket({
+      onAlert: () => {
+        loadAlerts();
+        loadLatest();
+      },
+    });
+    return () => socket.close();
+  }, [loadAlerts, loadLatest]);
+
+  useEffect(() => {
+    if (!selectedNodeId && nodes.length) {
+      setSelectedNodeId(nodeIdOf(nodes[0]));
+    }
+  }, [nodes, selectedNodeId]);
+
+  useEffect(() => {
+    if (!selectedNodeId) return;
+    let active = true;
+    const load = async () => {
+      const seq = ++historySeq.current;
+      try {
+        const to = new Date();
+        const from = new Date(Date.now() - 24 * 3600 * 1000);
+        const data = await getReadingsHistory({
+          from: from.toISOString(),
+          to: to.toISOString(),
+          nodeId: selectedNodeId,
+          bucket: "1h",
+        });
+        if (active && seq === historySeq.current) setHistory(data?.buckets || []);
+      } catch (err) {
+        if (active && seq === historySeq.current) {
+          setHistory([]);
+          if (err instanceof ApiError) showToast(getErrorMessage(err, "Couldn't load history"));
+        }
+      }
+    };
+    load();
+    const id = setInterval(load, 60000);
+    return () => {
+      active = false;
+      clearInterval(id);
+    };
+  }, [selectedNodeId, showToast]);
+
+  const handleAcknowledge = async (alert) => {
+    const id = alert.id ?? alert.alert_id;
+    if (id == null) return;
+    try {
+      await acknowledgeAlert(id);
+      await loadAlerts();
+    } catch (err) {
+      showToast(getErrorMessage(err, "Couldn't acknowledge the alert"));
+      loadAlerts();
+    }
+  };
+
+  const handleTogglePref = async (key, value) => {
+    const prevPrefs = profile?.notification_prefs || {};
+    const nextPrefs = { ...prevPrefs, [key]: value };
+    setProfile((p) => ({ ...(p || {}), notification_prefs: nextPrefs }));
+    try {
+      const updated = await updateProfile({ notification_prefs: nextPrefs });
+      if (updated) setProfile(updated);
+    } catch (err) {
+      setProfile((p) => ({ ...(p || {}), notification_prefs: prevPrefs }));
+      showToast(getErrorMessage(err, "Couldn't save your notification preferences"));
+    }
+  };
+
+  const handleSignOut = async () => {
+    await logout();
+    onSignedOut?.();
+  };
+
+  const selectedReading = latest[selectedNodeId];
 
   return (
     <div className="dashboard">
       <header className="dashboard__header">
         <div className="dashboard__logo">
-          <div className="dashboard__logo-mark"><Wind size={18} color="#fff" strokeWidth={2} /></div>
+          <div className="dashboard__logo-mark"><Wind size={18} color="#fff" strokeWidth={1.8} /></div>
           <span className="dashboard__logo-text">Empyrean</span>
         </div>
-        <AqiTickerSpace />
+        <AqiTickerSpace reading={selectedReading} nodeId={selectedNodeId} backendDown={backendDown} />
         <div className="search">
           <Search size={16} color="rgba(255,255,255,0.7)" />
           <input type="text" placeholder="Search areas, devices, alerts" className="search__input" />
         </div>
         <Tooltip label="Notifications"><button className="icon-btn"><Bell size={19} strokeWidth={1.8} /><span className="icon-btn__dot" /></button></Tooltip>
-        <ProfileMenu />
+        <ProfileMenu user={user ?? profile} onSignOut={handleSignOut} onSettings={() => setActiveTab("settings")} />
       </header>
 
       <div className="dashboard__body">
@@ -460,13 +746,29 @@ export default function EmpyreanDashboardLayout() {
         </aside>
 
         <main className="main">
-          {activeTab === "overview" && <OverviewContent />}
-          {activeTab === "map" && <MapContent />}
-          {activeTab === "analytics" && <AnalyticsContent />}
-          {activeTab === "devices" && <DevicesContent />}
-          {activeTab === "settings" && <SettingsContent />}
+          {activeTab === "overview" && (
+            <OverviewContent
+              reading={selectedReading}
+              history={history}
+              alerts={alerts}
+              onAcknowledge={handleAcknowledge}
+            />
+          )}
+          {activeTab === "map" && <MapContent nodes={nodes} latest={latest} />}
+          {activeTab === "analytics" && <AnalyticsContent history={history} />}
+          {activeTab === "devices" && <DevicesContent nodes={nodes} latest={latest} />}
+          {activeTab === "settings" && (
+            <SettingsContent
+              profile={profile}
+              onTogglePref={handleTogglePref}
+              activeProfile={healthProfile}
+              onProfileChange={setHealthProfile}
+            />
+          )}
         </main>
       </div>
+
+      <Toast toast={toast} />
     </div>
   );
 }

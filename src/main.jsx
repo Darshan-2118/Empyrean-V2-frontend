@@ -1,26 +1,73 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
-import ForgotPasswordPage from "./pages/forgot_password";
 import HowItWorksPage from "./pages/howItWorks";
 import LandingPage from "./pages/landingPage";
 import Navbar from "./components/Navbar";
+import * as EmpyreanAPI from "./api";
+import { subscribeAuth, getAuthState } from "./api";
 import "./index.css";
+
+window.EmpyreanAPI = EmpyreanAPI;
 
 import AboutPage from "./pages/About";
 import FeaturesPage from "./pages/Features";
-import EmpyreanDashboardLayout from "./pages/dashboard";
+
+const EmpyreanDashboardLayout = lazy(() => import("./pages/dashboard"));
+
+const ROUTES = {
+  landing: "/landing_page",
+  login: "/login",
+  register: "/register",
+  dashboard: "/dashboard",
+  about: "/about",
+  features: "/features",
+  howItWorks: "/how_it_works",
+};
+
+const pageFromPath = (path) =>
+  Object.keys(ROUTES).find((page) => ROUTES[page] === path) ?? "landing";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("landing");
+  const [currentPage, setCurrentPage] = useState(() =>
+    pageFromPath(window.location.pathname),
+  );
+  const [auth, setAuth] = useState(getAuthState());
 
-  // Single navigation handler shared by the navbar and in-page buttons.
-  // Reset scroll to the top so a scrolled-down page never opens mid-way.
-  const navigate = (path) => {
+  useEffect(() => subscribeAuth(setAuth), []);
+
+  useEffect(() => {
+    if (window.location.pathname !== ROUTES[currentPage]) {
+      window.history.replaceState({}, "", ROUTES[currentPage]);
+    }
+    const onPopState = () => {
+      window.scrollTo(0, 0);
+      setCurrentPage(pageFromPath(window.location.pathname));
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  const goTo = (page, { replace = false } = {}) => {
     window.scrollTo(0, 0);
-    setCurrentPage(path);
+    setCurrentPage(page);
+    const url = ROUTES[page];
+    if (url && window.location.pathname !== url) {
+      if (replace) window.history.replaceState({}, "", url);
+      else window.history.pushState({}, "", url);
+    }
   };
+
+  const navigate = (page) => goTo(page);
+
+  useEffect(() => {
+    if (auth.isAuthenticated && (currentPage === "login" || currentPage === "register")) {
+      goTo("dashboard", { replace: true });
+    } else if (currentPage === "dashboard" && !auth.isAuthenticated) {
+      goTo("login", { replace: true });
+    }
+  }, [currentPage, auth.isAuthenticated]);
 
   let pageEl;
 
@@ -28,7 +75,7 @@ function App() {
     case "register":
       pageEl = (
         <RegisterPage
-          onRegisterSuccess={() => navigate("login")}
+          onRegisterSuccess={() => navigate("dashboard")}
           onSwitchToLogin={() => navigate("login")}
         />
       );
@@ -47,14 +94,17 @@ function App() {
       break;
 
     case "dashboard":
-      pageEl = <EmpyreanDashboardLayout />;
-      break;
-
-    case "forgot-password":
-      pageEl = (
-        <ForgotPasswordPage
-          onResetSuccess={() => navigate("login")}
-          onSwitchToLogin={() => navigate("login")}
+      pageEl = auth.isAuthenticated ? (
+        <Suspense fallback={<div style={{ minHeight: "100vh" }} />}>
+          <EmpyreanDashboardLayout
+            user={auth.user}
+            onSignedOut={() => navigate("landing")}
+          />
+        </Suspense>
+      ) : (
+        <LoginPage
+          onLoginSuccess={() => navigate("dashboard")}
+          onSwitchToRegister={() => navigate("register")}
         />
       );
       break;
@@ -77,11 +127,17 @@ function App() {
       break;
 
     default: // login
-      pageEl = (
+      pageEl = auth.isAuthenticated ? (
+        <Suspense fallback={<div style={{ minHeight: "100vh" }} />}>
+          <EmpyreanDashboardLayout
+            user={auth.user}
+            onSignedOut={() => navigate("landing")}
+          />
+        </Suspense>
+      ) : (
         <LoginPage
           onLoginSuccess={() => navigate("dashboard")}
           onSwitchToRegister={() => navigate("register")}
-          onSwitchToForgotPassword={() => navigate("forgot-password")}
         />
       );
   }

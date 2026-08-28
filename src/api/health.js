@@ -1,12 +1,7 @@
-const HEALTH_TIMEOUT = 5000; // 5s
+const HEALTH_TIMEOUT = 5000;
 const HEALTH_RETRIES = 2;
-const HEALTH_RETRY_DELAY = 1000; // 1s
+const HEALTH_RETRY_DELAY = 1000;
 
-/**
- * Check if the backend server is reachable via the Vite proxy.
- * Includes timeout and retry logic for resilience.
- * @returns {Promise<{ok: boolean, data?: any, error?: string}>}
- */
 export async function checkHealth() {
   for (let attempt = 0; attempt <= HEALTH_RETRIES; attempt++) {
     const controller = new AbortController();
@@ -15,7 +10,6 @@ export async function checkHealth() {
     try {
       const res = await fetch("/health", {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
         signal: controller.signal,
       });
 
@@ -47,25 +41,3 @@ export async function checkHealth() {
     }
   }
 }
-
-/**
- * Base fetch wrapper for API calls.
- * Requests go through Vite's dev server proxy, so they are same-origin.
- */
-export async function apiFetch(path, options = {}) {
-  const config = {
-    headers: { "Content-Type": "application/json" },
-    ...options,
-  };
-
-  const res = await fetch(path, config);
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data.detail || data.message || `Request failed with ${res.status}`);
-  }
-
-  return data;
-}
-
-export default { checkHealth, apiFetch };
