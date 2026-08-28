@@ -7,7 +7,6 @@ import LandingPage from "./pages/landingPage";
 import Navbar from "./components/Navbar";
 import * as EmpyreanAPI from "./api";
 import { subscribeAuth, getAuthState } from "./api";
-import "./index.css";
 
 window.EmpyreanAPI = EmpyreanAPI;
 

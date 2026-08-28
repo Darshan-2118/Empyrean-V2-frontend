@@ -11,15 +11,14 @@
   "dependencies": {
     "leaflet": "^1.9.4",
     "lucide-react": "^1.29.0",
+    "miragejs": "^0.1.48",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-leaflet": "^4.2.1",
     "recharts": "^3.10.1"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "^4.3.0",
-    "tailwindcss": "^4.3.3",
     "vite": "^5.4.10"
   }
 }
