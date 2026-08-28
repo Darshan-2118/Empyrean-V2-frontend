@@ -135,6 +135,23 @@ export default function FeaturesPage({ onSwitchToLogin }) {
                 →
               </button>
             </div>
+
+            {typeof onSwitchToLogin === 'function' && (
+              <div className={styles.footerLinks} style={{ marginTop: '2.5rem' }}>
+                <span className={styles.secondaryActionText}>
+                  Already have an account?{' '}
+                  <a
+                    href="#login"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onSwitchToLogin();
+                    }}
+                  >
+                    Log in
+                  </a>
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Right Side: Stacking Cards */}

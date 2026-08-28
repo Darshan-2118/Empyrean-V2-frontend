@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import styles from "../styles/login.module.css";
 import logoGraphic from "../assets/landing/final-logo.svg";
-import { register } from "../api.js";
+import { register, updateProfile, getErrorMessage } from "../api";
 
 const FIELD_LABELS = {
   name: "Full Name",
@@ -25,7 +25,6 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
   });
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
-  const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const nameRef = useRef(null);
   const usernameRef = useRef(null);
@@ -89,7 +88,11 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
       return;
     }
 
-    if (field === "password" && formData.confirmPassword !== value) {
+    if (
+      field === "password" &&
+      formData.confirmPassword &&
+      formData.confirmPassword !== value
+    ) {
       setErrors((prev) => ({
         ...prev,
         password: "",
@@ -127,6 +130,7 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (submitting) return;
 
     const newErrors = {};
     for (const field of Object.keys(FIELD_LABELS)) {
@@ -143,6 +147,22 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
     ) {
       newErrors.confirmPassword = "Passwords do not match";
     }
+    if (
+      formData.username &&
+      !/^[A-Za-z0-9_]{3,50}$/.test(formData.username.trim())
+    ) {
+      newErrors.username =
+        "Username must be 3-50 characters (letters, numbers, underscores only)";
+    }
+    if (formData.password) {
+      const passwordBytes = new TextEncoder().encode(formData.password).length;
+      if (passwordBytes < 6 || passwordBytes > 72) {
+        newErrors.password = "Password must be 6-72 characters";
+      }
+    }
+    if (formData.email && formData.email.trim().length > 255) {
+      newErrors.email = "Email is too long";
+    }
 
     setErrors(newErrors);
 
@@ -152,27 +172,30 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
       return;
     }
 
-    setMessage("");
-    setFormError("");
     setSubmitting(true);
+    setMessage("");
     try {
-      // Backend accepts only username/email/password and auto-logs-in.
-      const data = await register({
-        username: formData.username,
-        email: formData.email,
+      await register({
+        username: formData.username.trim(),
+        email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });
+      try {
+        await updateProfile({
+          notification_prefs: {
+            full_name: formData.name.trim(),
+            age: Number(formData.age),
+            gender: formData.gender,
+          },
+        });
+      } catch {
+      }
       setMessage("Registration successful!");
       if (typeof onRegisterSuccess === "function") {
-        onRegisterSuccess(data && data.role);
+        onRegisterSuccess();
       }
     } catch (err) {
-      setMessage("");
-      setFormError(
-        err && err.message
-          ? err.message
-          : "Unable to create your account — please try again."
-      );
+      setMessage(getErrorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -316,12 +339,6 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
                     {errors.confirmPassword}
                   </span>
                 </div>
-
-                {formError ? (
-                  <p role="alert" className={styles.formError}>
-                    {formError}
-                  </p>
-                ) : null}
 
                 <button type="submit" className={styles.loginButton} disabled={submitting}>
                   {submitting ? "Creating account…" : "Register"}

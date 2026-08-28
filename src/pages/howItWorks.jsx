@@ -107,7 +107,6 @@ const CONDITIONS = [
 ];
 
 export default function HowItWorksPage({
-  onBackHome,
   onSwitchToLogin,
   onSwitchToRegister,
 }) {
@@ -183,7 +182,7 @@ export default function HowItWorksPage({
               <span className={`${styles.devicePin} ${styles.pinBR}`}>04</span>
 
               <div className={styles.deviceScreen}>
-                <span className={styles.screenLabel}>live aqi</span>
+                <span className={styles.screenLabel}>sample aqi</span>
                 <span className={styles.screenValue}>74</span>
                 <span className={styles.screenSub}>PM2.5 · 42.1 µg/m³</span>
                 <span className={styles.screenCursor} aria-hidden="true" />

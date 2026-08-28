@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import styles from "../styles/login.module.css";
 import logoGraphic from "../assets/landing/final-logo.svg";
-import { login } from "../api.js";
+import { login, ApiError, getErrorMessage } from "../api";
 
 const FIELD_LABELS = {
   username: "Email or username",
@@ -11,7 +11,6 @@ const FIELD_LABELS = {
 export default function LoginPage({
   onLoginSuccess,
   onSwitchToRegister,
-  onSwitchToForgotPassword,
   onSwitchToAbout,
   onSwitchToFeatures,
 }) {
@@ -20,7 +19,7 @@ export default function LoginPage({
     password: "",
   });
   const [errors, setErrors] = useState({});
-  const [formError, setFormError] = useState("");
+  const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const usernameRef = useRef(null);
   const passwordRef = useRef(null);
@@ -29,6 +28,7 @@ export default function LoginPage({
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
+    setMessage("");
   };
 
   const handleBlur = (field) => {
@@ -56,6 +56,7 @@ export default function LoginPage({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
 
     const newErrors = {};
     for (const field of Object.keys(FIELD_LABELS)) {
@@ -76,19 +77,19 @@ export default function LoginPage({
       return;
     }
 
-    setFormError("");
     setSubmitting(true);
+    setMessage("");
     try {
-      const data = await login({ username: formData.username, password: formData.password });
+      await login({ username: formData.username, password: formData.password });
       if (typeof onLoginSuccess === "function") {
-        onLoginSuccess(data && data.role);
+        onLoginSuccess();
       }
     } catch (err) {
-      setErrors({});
-      setFormError(
-        err && err.message ? err.message : "Unable to sign in — please try again."
-      );
-      if (err && err.status === 401) passwordRef.current?.focus();
+      if (err instanceof ApiError && err.status === 401) {
+        setMessage("Invalid username or password");
+      } else {
+        setMessage(getErrorMessage(err));
+      }
     } finally {
       setSubmitting(false);
     }
@@ -156,12 +157,6 @@ export default function LoginPage({
                   <span className={styles.fieldError}>{errors.password}</span>
                 </div>
 
-                {formError ? (
-                  <p role="alert" className={styles.formError}>
-                    {formError}
-                  </p>
-                ) : null}
-
                 <button type="submit" className={styles.loginButton} disabled={submitting}>
                   {submitting ? "Signing in…" : "Login"}
                 </button>
@@ -178,19 +173,10 @@ export default function LoginPage({
                   >
                     Create an Account
                   </a>
-                  <a
-                    href="#forgot"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (typeof onSwitchToForgotPassword === "function") {
-                        onSwitchToForgotPassword();
-                      }
-                    }}
-                  >
-                    Forgot password?
-                  </a>
                 </div>
               </form>
+
+              {message ? <p className={styles.formMessage}>{message}</p> : null}
             </div>
           </div>
         </div>

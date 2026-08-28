@@ -478,6 +478,11 @@
     font-size: 0.9rem;
   }
 
+  .hero {
+    height: auto;
+    min-height: calc(100vh - 140px);
+  }
+
   .wordmark {
     font-size: clamp(3rem, 15vw, 6rem);
     letter-spacing: 0.04em;
