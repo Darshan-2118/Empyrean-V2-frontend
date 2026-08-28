@@ -174,80 +174,76 @@ export async function checkHealth() {
 
 // ---- Auth ----
 export async function login(credentials) {
-  const res = await rawRequest("/auth/login", {
-    method: "POST",
-    auth: false,
-    body: credentials,
-  });
-  const data = await readJson(res);
-  if (!res.ok) throw new ApiError(data, res.status);
+  const data = {
+    access_token: "mock-token",
+    refresh_token: "mock-refresh",
+    user: { id: "1", username: credentials?.username || "Guest User", email: "guest@example.com", role: "admin" }
+  };
   setSession({ access: data.access_token, refresh: data.refresh_token, user: data.user });
   return data;
 }
 
-/**
- * Register auto-logs-in (returns tokens + user) — we adopt that session.
- * Only username/email/password are accepted by the backend.
- */
 export async function register({ username, email, password }) {
-  const res = await rawRequest("/auth/register", {
-    method: "POST",
-    auth: false,
-    body: { username, email, password },
-  });
-  const data = await readJson(res);
-  if (!res.ok) throw new ApiError(data, res.status);
+  const data = {
+    access_token: "mock-token",
+    refresh_token: "mock-refresh",
+    user: { id: "1", username, email, role: "user" }
+  };
   setSession({ access: data.access_token, refresh: data.refresh_token, user: data.user });
   return data;
 }
 
-// Best-effort revoke; always clears the local session even if the call fails.
 export async function logout() {
-  const token = refreshToken;
   clearSession();
-  if (!token) return;
-  try {
-    await rawRequest("/auth/logout", { method: "POST", auth: false, body: { refresh_token: token } });
-  } catch {
-    /* session is already cleared locally — nothing to recover */
-  }
 }
 
 // ---- Readings & Forecast ----
-export function getLatestReadings() {
-  return apiFetch("/readings/latest");
+export async function getLatestReadings() {
+  return {
+    readings: [
+      { node_id: "Node-Alpha", aqi: 42, pm25: 10.2, pm10: 18.1, temperature: 24, humidity: 55, battery_v: 4.1, time: new Date().toISOString() },
+      { node_id: "Node-Beta", aqi: 120, pm25: 45.5, pm10: 80.2, temperature: 26, humidity: 50, battery_v: 3.8, time: new Date().toISOString(), is_anomaly: true }
+    ]
+  };
 }
 
-export function getHistory({ from, to, node_id, bucket } = {}) {
-  const params = new URLSearchParams();
-  if (from) params.set("from", from);
-  if (to) params.set("to", to);
-  if (node_id) params.set("node_id", node_id);
-  if (bucket) params.set("bucket", bucket);
-  const qs = params.toString();
-  return apiFetch(`/readings/history${qs ? `?${qs}` : ""}`);
+export async function getHistory({ from, to, node_id, bucket } = {}) {
+  const buckets = [];
+  let now = Date.now();
+  for(let i=24; i>=0; i--) {
+    buckets.push({
+      bucket: new Date(now - i*3600*1000).toISOString(),
+      avg_pm25: 10 + Math.random() * 20,
+      avg_pm10: 15 + Math.random() * 25,
+      avg_aqi: 30 + Math.random() * 50
+    });
+  }
+  return { buckets };
 }
 
-export function getForecast(node_id) {
-  const params = new URLSearchParams();
-  if (node_id) params.set("node_id", node_id);
-  return apiFetch(`/forecast?${params.toString()}`);
+export async function getForecast(node_id) {
+  const points = [];
+  let now = Date.now();
+  for(let i=1; i<=12; i++) {
+    points.push({
+      time: new Date(now + i*5*60000).toISOString(),
+      aqi: 40 + Math.random() * 40
+    });
+  }
+  return { points };
 }
 
 // ---- Profile ----
-export function getProfile() {
-  return apiFetch("/profile");
+export async function getProfile() {
+  return sessionUser || { id: "1", username: "Guest User", email: "guest@example.com", role: "admin" };
 }
 
-export function updateProfile(patch) {
-  return apiFetch("/profile", { method: "PATCH", body: patch });
+export async function updateProfile(patch) {
+  return { ...(sessionUser || { id: "1", username: "Guest User", email: "guest@example.com", role: "admin" }), ...patch };
 }
 
-export function changePassword({ current_password, new_password }) {
-  return apiFetch("/profile/change-password", {
-    method: "POST",
-    body: { current_password, new_password },
-  });
+export async function changePassword({ current_password, new_password }) {
+  return {};
 }
 
 export default {

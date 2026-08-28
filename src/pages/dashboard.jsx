@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import {
   Wind, Search, Bell, ChevronDown, User, Users, LogOut, Settings, Cpu,
   LayoutDashboard, Map as MapIcon, BarChart3, Activity, AlertTriangle, CheckCircle,
-  Battery, RefreshCw, Info, Droplets, Thermometer, Gauge
+  Battery, RefreshCw, Info, Droplets, Thermometer, Gauge, Menu
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { MapContainer, TileLayer, Popup, CircleMarker } from "react-leaflet";
@@ -354,7 +354,7 @@ function AnalyticsContent({ readings }) {
         <div className="widget__header">
           <h3>Daily Summary</h3>
         </div>
-        <div className="widget__body">
+        <div className="widget__body" style={{ justifyContent: 'flex-start' }}>
           <p className="profile-desc" style={{ marginBottom: '24px' }}>
             {nodeId ? `Averaged from ${nodeId} over the last 24 hours.` : "No sensor data yet — summary appears once nodes report readings."}
           </p>
@@ -456,6 +456,7 @@ function DevicesContent({ readings }) {
 // ---------------------------------------------------------------------------
 
 function OverviewContent({ readings, error }) {
+  const session = getSession();
   const nodeId = readings[0]?.node_id;
   const { buckets, loading } = useHistory({ bucket: "1h", hours: 24, node_id: nodeId });
 
@@ -471,25 +472,25 @@ function OverviewContent({ readings, error }) {
 
   return (
     <div className="overview-grid">
-      {/* Widget 1: Health Profile (frontend concept — static choice) */}
+      {/* Widget 1: User profile summary */}
       <div className="widget widget--profile">
         <div className="widget__header">
-          <h3>Active Health Profile</h3>
-          <Activity size={18} className="text-accent" />
+          <h3>User Profile Summary</h3>
+          <User size={18} className="text-accent" />
         </div>
         <div className="widget__body">
-          <h2 className="profile-name">Asthma Mode</h2>
-          <p className="profile-desc">High sensitivity. Alerts trigger on mild PM2.5 & NO2 breaches.</p>
+          <h2 className="profile-name">{session?.user?.username || "Guest"}</h2>
+          <p className="profile-desc">{session?.user?.email || "—"}</p>
           <div className="status-badge status-badge--safe">
-            <CheckCircle size={14} /> Safe Zone
+            <CheckCircle size={14} /> Role: {session?.user?.role || "user"}
           </div>
         </div>
       </div>
 
-      {/* Widget 2: PM2.5 exposure trend from /readings/history */}
+      {/* Widget 2: Historical trends */}
       <div className="widget widget--chart">
         <div className="widget__header">
-          <h3>PM2.5 Exposure Trend</h3>
+          <h3>Historical Trends</h3>
           <BarChart3 size={18} className="text-accent" />
         </div>
         {error ? (
@@ -515,10 +516,10 @@ function OverviewContent({ readings, error }) {
         )}
       </div>
 
-      {/* Widget 3: Live telemetry */}
+      {/* Widget 3: Recent readings */}
       <div className="widget widget--sensors">
         <div className="widget__header">
-          <h3>Live Telemetry</h3>
+          <h3>Recent Readings</h3>
           {primary ? <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{primary.node_id}</span> : <Cpu size={18} className="text-accent" />}
         </div>
         {!primary ? (
@@ -553,10 +554,10 @@ function OverviewContent({ readings, error }) {
         )}
       </div>
 
-      {/* Widget 4: Alerts — anomalies flagged in live data (alerts API not deployed) */}
+      {/* Widget 4: Alert notifications */}
       <div className="widget widget--alerts">
         <div className="widget__header">
-          <h3>Recent Alerts</h3>
+          <h3>Alert Notifications</h3>
           <Bell size={18} className="text-accent" />
         </div>
         {error ? (
@@ -757,6 +758,7 @@ function SettingsContent() {
 
 export default function EmpyreanDashboardLayout({ onLogout }) {
   const [activeTab, setActiveTab] = useState("overview");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { readings, error } = useLatestReadings();
   const session = getSession();
 
@@ -767,10 +769,6 @@ export default function EmpyreanDashboardLayout({ onLogout }) {
   return (
     <div className="dashboard">
       <header className="dashboard__header">
-        <div className="dashboard__logo">
-          <div className="dashboard__logo-mark"><Wind size={18} color="#fff" strokeWidth={2} /></div>
-          <span className="dashboard__logo-text">Empyrean</span>
-        </div>
         <AqiTicker readings={readings} />
         <div className="search">
           <Search size={16} color="rgba(255,255,255,0.7)" />
@@ -782,17 +780,45 @@ export default function EmpyreanDashboardLayout({ onLogout }) {
 
       <div className="dashboard__body">
         <aside className={`rail ${isSidebarOpen ? 'rail--open' : ''}`}>
+          {isSidebarOpen ? (
+            <div style={{ display: 'flex', width: '100%', padding: '0 24px', alignItems: 'center', gap: '12px', marginBottom: '32px', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+              <div className="profile-avatar" style={{ width: 40, height: 40, flexShrink: 0 }}>
+                <User size={20} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: '1rem', fontWeight: 600, color: '#fff', letterSpacing: '0.5px' }}>
+                  {session?.user?.username || 'Guest'}
+                </span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--accent-color)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  {session?.user?.role || 'Admin'}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', width: '100%', justifyContent: 'center', marginBottom: '32px' }}>
+              <div className="profile-avatar" style={{ width: 40, height: 40, flexShrink: 0 }}>
+                <User size={20} />
+              </div>
+            </div>
+          )}
 
           <nav className="rail__nav">
-            <IconRailButton isOpen={isSidebarOpen} icon={LayoutDashboard} label="Overview" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
-            <IconRailButton isOpen={isSidebarOpen} icon={MapIcon} label="Geo-Map" active={activeTab === 'map'} onClick={() => setActiveTab('map')} />
-            <IconRailButton isOpen={isSidebarOpen} icon={BarChart3} label="Analytics" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
+            <IconRailButton 
+              isOpen={isSidebarOpen} 
+              icon={Menu} 
+              label="Menu" 
+              active={false} 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+            />
+            <IconRailButton isOpen={isSidebarOpen} icon={LayoutDashboard} label="Overview" active={activeTab === 'overview'} onClick={() => { setActiveTab('overview'); setIsSidebarOpen(true); }} />
+            <IconRailButton isOpen={isSidebarOpen} icon={MapIcon} label="Geo-Map" active={activeTab === 'map'} onClick={() => { setActiveTab('map'); setIsSidebarOpen(true); }} />
+            <IconRailButton isOpen={isSidebarOpen} icon={BarChart3} label="Analytics" active={activeTab === 'analytics'} onClick={() => { setActiveTab('analytics'); setIsSidebarOpen(true); }} />
           </nav>
           <div className="rail__spacer" />
           <div className="rail__bottom">
-            <IconRailButton isOpen={isSidebarOpen} icon={Cpu} label="Devices" active={activeTab === 'devices'} onClick={() => setActiveTab('devices')} />
+            <IconRailButton isOpen={isSidebarOpen} icon={Cpu} label="Devices" active={activeTab === 'devices'} onClick={() => { setActiveTab('devices'); setIsSidebarOpen(true); }} />
             <div className="rail__divider" />
-            <IconRailButton isOpen={isSidebarOpen} icon={Settings} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
+            <IconRailButton isOpen={isSidebarOpen} icon={Settings} label="Settings" active={activeTab === 'settings'} onClick={() => { setActiveTab('settings'); setIsSidebarOpen(true); }} />
           </div>
         </aside>
 

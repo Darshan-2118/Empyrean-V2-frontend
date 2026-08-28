@@ -6,7 +6,6 @@ import ForgotPasswordPage from "./pages/forgot_password";
 import HowItWorksPage from "./pages/howItWorks";
 import LandingPage from "./pages/landingPage";
 import Navbar from "./components/Navbar";
-import "./index.css";
 
 import AboutPage from "./pages/About";
 import FeaturesPage from "./pages/Features";
