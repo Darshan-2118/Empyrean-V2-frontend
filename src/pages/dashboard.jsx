@@ -199,8 +199,8 @@ function MapContent({ nodes, latest }) {
     <div className="map-wrapper" style={{ height: "100%", width: "100%", borderRadius: "24px", overflow: "hidden", border: "1px solid var(--border-color)", zIndex: 0 }}>
       <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%", zIndex: 1 }}>
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; CARTO'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <Recenter center={center} />
         {markers.map(({ node, position }, index) => {

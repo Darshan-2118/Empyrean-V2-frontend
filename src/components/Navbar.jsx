@@ -12,7 +12,7 @@ const NAV = [
   { label: "Home", path: "landing" },
   { label: "How it works?", path: "howItWorks" },
   { label: "Features", path: "features" },
-  { label: "Live Map", disabled: true },
+  { label: "Live Map", path: "liveMap" },
   { label: "About", path: "about" },
 ];
 
