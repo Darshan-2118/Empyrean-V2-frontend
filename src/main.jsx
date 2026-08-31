@@ -12,6 +12,7 @@ window.EmpyreanAPI = EmpyreanAPI;
 
 import AboutPage from "./pages/About";
 import FeaturesPage from "./pages/Features";
+import LiveMapPage from "./pages/liveMap";
 
 const EmpyreanDashboardLayout = lazy(() => import("./pages/dashboard"));
 
@@ -22,6 +23,7 @@ const ROUTES = {
   dashboard: "/dashboard",
   about: "/about",
   features: "/features",
+  liveMap: "/live-map",
   howItWorks: "/how_it_works",
 };
 
@@ -89,6 +91,12 @@ function App() {
     case "features":
       pageEl = (
         <FeaturesPage onSwitchToLogin={() => navigate("login")} />
+      );
+      break;
+
+    case "liveMap":
+      pageEl = (
+        <LiveMapPage />
       );
       break;
 
