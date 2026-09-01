@@ -19,7 +19,12 @@ const NAV = [
 export default function Navbar({ active, onNavigate }) {
   const go = (path) => (e) => {
     e.preventDefault();
-    onNavigate?.(path);
+    const el = document.getElementById(path);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    } else {
+      onNavigate?.(path);
+    }
   };
 
   return (
