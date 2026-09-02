@@ -1,0 +1,266 @@
+.pageContainer {
+  min-height: calc(100vh - 80px);
+  width: 100%;
+  background:
+    linear-gradient(rgba(10, 31, 31, 0.7), rgba(10, 31, 31, 0.7)),
+    repeating-linear-gradient(
+      90deg,
+      #08201a,
+      #08201a 40px,
+      #0c2a22 40px,
+      #0c2a22 80px
+    );
+  padding: 2rem 3rem;
+  font-family: 'Gugi', sans-serif;
+  color: white;
+  position: relative;
+  overflow-y: auto;
+}
+
+.pageContainer::before {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: #73938A;
+  mix-blend-mode: overlay;
+  opacity: 0.15;
+  filter: blur(80px);
+  top: 10%;
+  right: 10%;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.headerTitle {
+  font-family: 'Aboreto', cursive;
+  font-size: 1.8rem;
+  font-weight: 400;
+  letter-spacing: 2px;
+  margin: 0;
+  color: var(--accent-color, #4cdbaf);
+}
+
+.headerSubtitle {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.logoutBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.6rem 1.4rem;
+  border-radius: 12px;
+  font-family: 'Gugi', sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.logoutBtn:hover {
+  background: rgba(255, 107, 107, 0.1);
+  border-color: rgba(255, 107, 107, 0.3);
+  color: #ff6b6b;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.statCard {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.statCard:hover {
+  transform: translateY(-3px);
+  border-color: rgba(76, 219, 175, 0.3);
+}
+
+.statCardAccent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  border-radius: 20px 20px 0 0;
+}
+
+.statCardAccentNodes {
+  background: linear-gradient(90deg, #4cdbaf, #00FFE6);
+}
+
+.statCardAccentUsers {
+  background: linear-gradient(90deg, #60a5fa, #818cf8);
+}
+
+.statCardAccentActive {
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+}
+
+.statIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statIconNodes {
+  background: rgba(76, 219, 175, 0.12);
+  color: #4cdbaf;
+}
+
+.statIconUsers {
+  background: rgba(96, 165, 250, 0.12);
+  color: #60a5fa;
+}
+
+.statIconActive {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+}
+
+.statLabel {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.statValue {
+  font-size: 2.4rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1;
+}
+
+.statValueNodes {
+  color: #4cdbaf;
+}
+
+.statValueUsers {
+  color: #60a5fa;
+}
+
+.statValueActive {
+  color: #fbbf24;
+}
+
+.statTrend {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+}
+
+.statTrend span {
+  color: #4cdbaf;
+  font-weight: 600;
+}
+
+.chartSection {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 1.8rem;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.chartTitle {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: white;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.chartLegend {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.chartLegendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.legendDotActive {
+  background: #4cdbaf;
+}
+
+.legendDotTotal {
+  background: rgba(76, 219, 175, 0.3);
+}
+
+.chartContainer {
+  width: 100%;
+  height: 300px;
+}
+
+@media (max-width: 900px) {
+  .statsRow {
+    grid-template-columns: 1fr;
+  }
+
+  .pageContainer {
+    padding: 1.5rem;
+  }
+}

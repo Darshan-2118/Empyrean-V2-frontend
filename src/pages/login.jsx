@@ -4,7 +4,7 @@ import logoGraphic from "../assets/landing/final-logo.svg";
 import { login, ApiError, getErrorMessage } from "../api";
 
 const FIELD_LABELS = {
-  username: "Email or username",
+  username: "Username",
   password: "Password",
 };
 
@@ -127,7 +127,7 @@ export default function LoginPage({
 
               <form onSubmit={handleSubmit} className={styles.form}>
                 <div className={styles.inputGroup}>
-                  <label htmlFor="username">Email or username</label>
+                  <label htmlFor="username">Username</label>
                   <input
                     ref={usernameRef}
                     type="text"
@@ -137,7 +137,7 @@ export default function LoginPage({
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
                     onBlur={() => handleBlur("username")}
-                    placeholder="Enter your email or username"
+                    placeholder="Enter your username"
                   />
                   <span className={styles.fieldError}>{errors.username}</span>
                 </div>

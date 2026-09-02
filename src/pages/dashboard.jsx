@@ -595,6 +595,7 @@ export default function EmpyreanDashboardLayout({ user, onSignedOut }) {
   const [pendingTab, setPendingTab] = useState(null);
   const toastTimer = useRef(null);
   const historySeq = useRef(0);
+  const initialLoadRef = useRef(false);
 
   const handleTabChange = useCallback((newTab) => {
     if (hasUnsavedChanges) {
@@ -646,6 +647,8 @@ export default function EmpyreanDashboardLayout({ user, onSignedOut }) {
   }, [loadAlerts]);
 
   useEffect(() => {
+    if (initialLoadRef.current) return;
+    initialLoadRef.current = true;
     let active = true;
     getNodes()
       .then((data) => {
@@ -656,7 +659,10 @@ export default function EmpyreanDashboardLayout({ user, onSignedOut }) {
       });
     getProfile()
       .then((data) => {
-        if (active) setProfile(data);
+        if (active) {
+          setProfile(data);
+          if (data?.health_profile) setHealthProfile(data.health_profile);
+        }
       })
       .catch((err) => {
         if (active && err instanceof ApiError) showToast(getErrorMessage(err));
@@ -717,10 +723,10 @@ export default function EmpyreanDashboardLayout({ user, onSignedOut }) {
     if (id == null) return;
     try {
       await acknowledgeAlert(id);
+      showToast("Alert acknowledged", "success");
       await loadAlerts();
     } catch (err) {
       showToast(getErrorMessage(err, "Couldn't acknowledge the alert"));
-      loadAlerts();
     }
   };
 
@@ -734,6 +740,18 @@ export default function EmpyreanDashboardLayout({ user, onSignedOut }) {
     } catch (err) {
       setProfile((p) => ({ ...(p || {}), notification_prefs: prevPrefs }));
       showToast(getErrorMessage(err, "Couldn't save your notification preferences"));
+    }
+  };
+
+  const handleProfileChange = async (profile) => {
+    setHealthProfile(profile);
+    try {
+      const updated = await updateProfile({ health_profile: profile });
+      if (updated) setProfile(updated);
+      showToast("Health profile updated", "success");
+    } catch (err) {
+      setHealthProfile(healthProfile);
+      showToast(getErrorMessage(err, "Couldn't save your health profile"));
     }
   };
 
@@ -806,7 +824,7 @@ export default function EmpyreanDashboardLayout({ user, onSignedOut }) {
               profile={profile}
               onTogglePref={handleTogglePref}
               activeProfile={healthProfile}
-              onProfileChange={setHealthProfile}
+              onProfileChange={handleProfileChange}
             />
           )}
         </main>

@@ -82,17 +82,8 @@ export default function Navbar({ active, onNavigate, auth }) {
   const displayActive = active === "landing" ? SECTION_PATHS[landingSection] : active;
   const go = (path) => (e) => {
     e.preventDefault();
-    const sectionId = active === "landing" ? LANDING_SECTIONS[path] : undefined;
-    const el = sectionId ? document.getElementById(sectionId) : null;
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-      const url = `${window.location.pathname}#${sectionId}`;
-      if (window.location.hash !== `#${sectionId}`) {
-        window.history.pushState({}, "", url);
-      }
-    } else {
-      onNavigate?.(path);
-    }
+    // Navigate to the page route
+    onNavigate?.(path);
   };
 
   return (

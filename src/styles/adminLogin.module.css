@@ -1,0 +1,223 @@
+.pageContainer {
+  min-height: 100vh;
+  width: 100%;
+  background:
+    linear-gradient(rgba(10, 31, 31, 0.7), rgba(10, 31, 31, 0.7)),
+    repeating-linear-gradient(
+      90deg,
+      #08201a,
+      #08201a 40px,
+      #0c2a22 40px,
+      #0c2a22 80px
+    );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Gugi', sans-serif;
+  color: white;
+  padding: 2rem;
+}
+
+.glassCard {
+  display: flex;
+  width: 500px;
+  min-height: 480px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  position: relative;
+  animation: cardFadeIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.formPanel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.brandStrip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(180deg, #00FFE6, #4cdbaf);
+  border-radius: 30px 0 0 30px;
+  box-shadow: 0 0 20px rgba(0, 255, 230, 0.3);
+}
+
+.adminBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: rgba(76, 219, 175, 0.1);
+  border: 1px solid rgba(76, 219, 175, 0.3);
+  border-radius: 20px;
+  color: #4cdbaf;
+  font-size: 0.8rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.welcomeText {
+  font-size: 1.8rem;
+  font-weight: 400;
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.subtitleText {
+  font-size: 0.9rem;
+  margin: 0 0 2.5rem 0;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+  width: 100%;
+  max-width: 340px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-size: 0.85rem;
+  color: #4cdbaf;
+  opacity: 0.9;
+}
+
+.inputGroup input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.5rem 0;
+  font-size: 1rem;
+  outline: none;
+  font-family: 'Gugi', sans-serif;
+  transition: border-color 0.3s ease;
+}
+
+.inputGroup input:focus {
+  border-bottom-color: #4cdbaf;
+}
+
+.fieldError {
+  display: block;
+  height: 1rem;
+  line-height: 1rem;
+  font-size: 0.75rem;
+  color: #ff6b6b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.loginButton {
+  background: linear-gradient(180deg, #444, #111);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  font-weight: 400;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), inset 0 2px 5px rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: 'Gugi', sans-serif;
+  letter-spacing: 1px;
+}
+
+.loginButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.4), inset 0 2px 5px rgba(255, 255, 255, 0.3);
+}
+
+.loginButton:active {
+  transform: translateY(0);
+}
+
+.loginButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.formError {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  border-radius: 8px;
+  background: rgba(255, 107, 107, 0.12);
+  color: #ff8f8f;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.backLink {
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.backLink a {
+  color: #4cdbaf;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+.backLink a:hover {
+  opacity: 0.8;
+}
+
+/* ===== Mobile responsiveness ===== */
+
+@media (max-width: 600px) {
+  .pageContainer {
+    padding: 1.5rem;
+  }
+
+  .glassCard {
+    width: 100%;
+    min-height: 0;
+  }
+
+  .formPanel {
+    padding: 2rem 1.5rem;
+  }
+
+  .welcomeText {
+    font-size: 1.5rem;
+  }
+}
