@@ -27,6 +27,16 @@ export async function login({ username, password }) {
   return data;
 }
 
+// Proposes POST /auth/reset-password — backend endpoint to be added to match.
+// Request: { identifier, new_password }  ->  200 { message }
+export async function resetPassword({ identifier, newPassword }) {
+  return apiFetch("/auth/reset-password", {
+    method: "POST",
+    body: { identifier, new_password: newPassword },
+    auth: false,
+  });
+}
+
 export async function refresh() {
   return refreshSession();
 }

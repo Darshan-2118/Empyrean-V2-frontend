@@ -11,6 +11,7 @@ const FIELD_LABELS = {
 export default function LoginPage({
   onLoginSuccess,
   onSwitchToRegister,
+  onSwitchToForgotPassword,
   onSwitchToAbout,
   onSwitchToFeatures,
 }) {
@@ -162,6 +163,17 @@ export default function LoginPage({
                 </button>
 
                 <div className={styles.footerLinks}>
+                  <a
+                    href="#forgot-password"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (typeof onSwitchToForgotPassword === "function") {
+                        onSwitchToForgotPassword();
+                      }
+                    }}
+                  >
+                    Forgot password?
+                  </a>
                   <a
                     href="#create"
                     onClick={(e) => {

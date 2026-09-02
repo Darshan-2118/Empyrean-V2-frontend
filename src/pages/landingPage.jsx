@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import styles from "../styles/landing.module.css";
+import loginStyles from "../styles/login.module.css";
+import aboutStyles from "../styles/About.module.css";
 
 /* ===== Feature icons (darker forest green inside sage badges) ===== */
 
@@ -115,6 +117,135 @@ function EyeIcon() {
   );
 }
 
+/* ===== Intelligent Features icons (section 4) ===== */
+
+function RadarTargetIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="8" />
+      <circle cx="12" cy="12" r="4.5" />
+      <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none" />
+      <path d="M12 2.5v2.5" />
+      <path d="M12 19v2.5" />
+      <path d="M2.5 12H5" />
+      <path d="M19 12h2.5" />
+    </svg>
+  );
+}
+
+function HeartPulseIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 20.5C7 16.5 3.5 13.2 3.5 9.5a4.5 4.5 0 0 1 8.5-2 4.5 4.5 0 0 1 8.5 2c0 3.7-3.5 7-8.5 11Z" />
+      <path d="M6.8 11.5h2.6l1-2 1.5 3.5 1-2h3.3" />
+    </svg>
+  );
+}
+
+function CpuChipIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="7" y="7" width="10" height="10" rx="1.5" />
+      <rect x="10.5" y="10.5" width="3" height="3" />
+      <path d="M9.5 7V4.5" />
+      <path d="M12 7V4.5" />
+      <path d="M14.5 7V4.5" />
+      <path d="M9.5 19.5V17" />
+      <path d="M12 19.5V17" />
+      <path d="M14.5 19.5V17" />
+      <path d="M7 9.5H4.5" />
+      <path d="M7 12H4.5" />
+      <path d="M7 14.5H4.5" />
+      <path d="M19.5 9.5H17" />
+      <path d="M19.5 12H17" />
+      <path d="M19.5 14.5H17" />
+    </svg>
+  );
+}
+
+function MapRouteIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3.5 6.5 8 4.5l4 2 4.5-2 4 2v13l-4-2-4.5 2-4-2-4 2v-13Z" />
+      <path d="M8 4.5v13" />
+      <path d="M12 6.5v13" />
+      <path d="M16.5 4.5v13" />
+      <circle cx="15" cy="9.5" r="1.1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function AlertBellIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M6 15v-4.5a6 6 0 1 1 12 0V15l1.6 2.2H4.4L6 15Z" />
+      <path d="M10 20a2 2 0 0 0 4 0" />
+      <path d="M12 8.5v3" />
+      <path d="M12 14.5v.1" />
+    </svg>
+  );
+}
+
+function CityHeatIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3.5 20.5h17" />
+      <rect x="4.5" y="13.5" width="3.5" height="7" />
+      <rect x="9.5" y="8.5" width="3.5" height="12" />
+      <rect x="14.5" y="12" width="3.5" height="8.5" />
+      <path d="M10.7 5.5 9.4 8h2.7l-1.4 2.5" />
+    </svg>
+  );
+}
+
 const FEATURES = [
   { icon: <LeafIcon />, line1: "Real-Time", line2: "Monitoring" },
   { icon: <GlobeIcon />, line1: "Live Location", line2: "Tracking" },
@@ -135,7 +266,12 @@ const ORBIT_CLASSES = [
   styles.orbitPos5,
 ];
 
-export default function LandingPage({ onSwitchToHowItWorks }) {
+export default function LandingPage({
+  onSwitchToHowItWorks,
+  onSwitchToRegister,
+  onSwitchToFeatures,
+  onSwitchToLogin,
+}) {
   const pageRef = useRef(null);
 
   // Scroll-reveal: fade sections/cards up as they enter the viewport.
@@ -236,34 +372,14 @@ export default function LandingPage({ onSwitchToHowItWorks }) {
           </div>
         </main>
 
-        {/* Centerpiece orb — continues into the features section below */}
+        {/* Centerpiece orb — badges live inside so they always align with the ring */}
         <div className={styles.orbWrap} aria-hidden="true">
           <div className={styles.orbOuterRing}></div>
           <div className={styles.orbGlow}></div>
-        </div>
-
-        <button
-          type="button"
-          className={styles.trackButton}
-          onClick={() => {
-            const el = document.getElementById("howItWorks");
-            if (el) el.scrollIntoView({ behavior: "smooth" });
-            else onSwitchToHowItWorks?.();
-          }}
-        >
-          Track &gt;&gt;&gt;
-        </button>
-      </section>
-
-      {/* ===== Section 2: Orb Orbital Features ===== */}
-      <section id="orb-features" data-reveal className={`${styles.features} ${styles.reveal}`}>
-        <div className={styles.featuresRow}>
           {FEATURES.map((feature, index) => (
             <div
               key={feature.line1 + feature.line2}
-              data-reveal
-              className={`${styles.featureItem} ${ORBIT_CLASSES[index]} ${styles.reveal}`}
-              style={{ "--reveal-delay": `${index * 90}ms` }}
+              className={`${styles.featureItem} ${ORBIT_CLASSES[index]}`}
             >
               <div className={styles.featureBadge}>{feature.icon}</div>
               <p className={styles.featureLabel}>
@@ -273,7 +389,17 @@ export default function LandingPage({ onSwitchToHowItWorks }) {
             </div>
           ))}
         </div>
+
+        <button
+          type="button"
+          className={styles.trackButton}
+          onClick={() => onSwitchToLogin?.()}
+        >
+          Track &gt;&gt;&gt;
+        </button>
       </section>
+
+      <div className={styles.features} aria-hidden="true" />
 
       {/* ===== Section 3: How It Works (Hardware & 4-Stage Pipeline) ===== */}
       <section id="howItWorks" data-reveal className={`${styles.sectionContainer} ${styles.reveal}`}>
@@ -360,7 +486,16 @@ export default function LandingPage({ onSwitchToHowItWorks }) {
         </div>
       </section>
 
-      {/* ===== Section 4: Features Deep-Dive ===== */}
+      {/* "See More" — jump to the full How It Works page */}
+      <div className={styles.seeMoreWrap}>
+        <button
+          type="button"
+          className={styles.seeMoreBtn}
+          onClick={() => onSwitchToHowItWorks?.()}
+        >
+          See More →
+        </button>
+      </div>
       <section id="features" data-reveal className={`${styles.sectionContainer} ${styles.reveal}`}>
         <header className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Intelligent Features</h2>
@@ -372,7 +507,7 @@ export default function LandingPage({ onSwitchToHowItWorks }) {
         <div className={styles.featuresDeepGrid}>
           <div className={styles.featureDeepCard} data-reveal>
             <div className={styles.featureHeader}>
-              <div className={styles.featureIconBadge}>📡</div>
+              <div className={styles.featureIconBadge}><RadarTargetIcon /></div>
               <h3 className={styles.cardTitle}>Real-Time Tracking</h3>
             </div>
             <p className={styles.cardText}>
@@ -382,7 +517,7 @@ export default function LandingPage({ onSwitchToHowItWorks }) {
 
           <div className={styles.featureDeepCard} data-reveal>
             <div className={styles.featureHeader}>
-              <div className={styles.featureIconBadge}>🫀</div>
+              <div className={styles.featureIconBadge}><HeartPulseIcon /></div>
               <h3 className={styles.cardTitle}>Calibrated Health Modes</h3>
             </div>
             <p className={styles.cardText}>
@@ -392,7 +527,7 @@ export default function LandingPage({ onSwitchToHowItWorks }) {
 
           <div className={styles.featureDeepCard} data-reveal>
             <div className={styles.featureHeader}>
-              <div className={styles.featureIconBadge}>🧠</div>
+              <div className={styles.featureIconBadge}><CpuChipIcon /></div>
               <h3 className={styles.cardTitle}>Smart AQI Engine</h3>
             </div>
             <p className={styles.cardText}>
@@ -402,7 +537,7 @@ export default function LandingPage({ onSwitchToHowItWorks }) {
 
           <div className={styles.featureDeepCard} data-reveal>
             <div className={styles.featureHeader}>
-              <div className={styles.featureIconBadge}>🗺️</div>
+              <div className={styles.featureIconBadge}><MapRouteIcon /></div>
               <h3 className={styles.cardTitle}>Live Geo-Visualization</h3>
             </div>
             <p className={styles.cardText}>
@@ -412,7 +547,7 @@ export default function LandingPage({ onSwitchToHowItWorks }) {
 
           <div className={styles.featureDeepCard} data-reveal>
             <div className={styles.featureHeader}>
-              <div className={styles.featureIconBadge}>🔔</div>
+              <div className={styles.featureIconBadge}><AlertBellIcon /></div>
               <h3 className={styles.cardTitle}>Instant Alerts</h3>
             </div>
             <p className={styles.cardText}>
@@ -422,7 +557,7 @@ export default function LandingPage({ onSwitchToHowItWorks }) {
 
           <div className={styles.featureDeepCard} data-reveal>
             <div className={styles.featureHeader}>
-              <div className={styles.featureIconBadge}>🏙️</div>
+              <div className={styles.featureIconBadge}><CityHeatIcon /></div>
               <h3 className={styles.cardTitle}>Smart-City Heatmaps</h3>
             </div>
             <p className={styles.cardText}>
@@ -431,6 +566,17 @@ export default function LandingPage({ onSwitchToHowItWorks }) {
           </div>
         </div>
       </section>
+
+      {/* "See More" — jump to the full Features page */}
+      <div className={styles.seeMoreWrap}>
+        <button
+          type="button"
+          className={styles.seeMoreBtn}
+          onClick={() => onSwitchToFeatures?.()}
+        >
+          See More →
+        </button>
+      </div>
 
       {/* ===== Section 5: Live Map Preview ===== */}
       <section id="liveMap" data-reveal className={`${styles.sectionContainer} ${styles.reveal}`}>
@@ -496,6 +642,79 @@ export default function LandingPage({ onSwitchToHowItWorks }) {
           </div>
         </div>
 
+        {/* ===== About Us (embedded homepage) ===== */}
+        <div data-reveal className={`${aboutStyles["about-content-wrapper"]} ${styles.reveal}`}>
+          {/* Title Section */}
+          <div className={aboutStyles["about-title-section"]}>
+            <h1 className={`${loginStyles.brandName} ${aboutStyles["about-brand-title"]}`}>
+              ABOUT US
+            </h1>
+          </div>
+
+          {/* Our Story & Our Mission */}
+          <div className={aboutStyles["about-grid-section"]}>
+            <div className={aboutStyles["about-info-card"]}>
+              <h3 className={aboutStyles["about-card-title"]}>
+                Our Story
+              </h3>
+              <p className={aboutStyles["about-card-text"]}>
+                We're a team of engineering students from the Department of Computer Science and Design at RajaRajeswari College of Engineering. Frustrated by air-quality apps that only tell you the pollution level of an entire city block instead of what's actually in the air around you, we set out to build something more personal.
+              </p>
+            </div>
+
+            <div className={aboutStyles["about-info-card"]}>
+              <h3 className={aboutStyles["about-card-title"]}>
+                Our Mission
+              </h3>
+              <p className={aboutStyles["about-card-text"]}>
+                To turn air-quality monitoring from passive environmental data into an active, personal health-protection tool — especially for people whose lungs can't afford to guess.
+              </p>
+            </div>
+          </div>
+
+          {/* Meet the Team */}
+          <div className={aboutStyles["about-team-section"]}>
+            <h3 className={aboutStyles["about-team-title"]}>
+              Meet the Team
+            </h3>
+            <div className={loginStyles.teamGrid}>
+              <div className={aboutStyles["about-team-member"]}>
+                <h4 className={aboutStyles["about-member-name"]}>Darshan R</h4>
+                <p className={aboutStyles["about-member-role"]}>Backend Development and Cloud Infrastructure</p>
+              </div>
+              <div className={aboutStyles["about-team-member"]}>
+                <h4 className={aboutStyles["about-member-name"]}>Vyshali D D</h4>
+                <p className={aboutStyles["about-member-role"]}>UI/UX Design and Prototype Development</p>
+              </div>
+              <div className={aboutStyles["about-team-member"]}>
+                <h4 className={aboutStyles["about-member-name"]}>Chirag J Shetru</h4>
+                <p className={aboutStyles["about-member-role"]}> React Frontend Development & Responsive Web Implementation</p>
+              </div>
+              <div className={aboutStyles["about-team-member"]}>
+                <h4 className={aboutStyles["about-member-name"]}>Kushal U</h4>
+                <p className={aboutStyles["about-member-role"]}>React Frontend Development & Responsive Web Implementation</p>
+              </div>
+            </div>
+          </div>
+
+          {/* How We Work Together & Our Approach */}
+          <div className={aboutStyles["about-approach-section"]}>
+            <div className={aboutStyles["about-approach-item"]}>
+              <h3 className={aboutStyles["about-approach-title"]}>How We Work Together</h3>
+              <p className={aboutStyles["about-approach-text"]}>
+                Building Empyrean meant blending hardware, embedded systems, machine learning, and design into one cohesive product. We leaned on regular discussions, shared problem-solving, and a lot of trial and error to make sure every part of the system — from the sensor readings to the final dashboard — worked in harmony. It's a project shaped by teamwork as much as technology.
+              </p>
+            </div>
+
+            <div className={aboutStyles["about-approach-item"]}>
+              <h3 className={aboutStyles["about-approach-title"]}>Our Approach</h3>
+              <p className={aboutStyles["about-approach-text"]}>
+                Affordable IoT sensors + GPS + fuzzy logic + machine learning (Random Forest, DBSCAN), built by a small team that believed personalized air-quality data shouldn't be a luxury.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Call to Action Banner */}
         <div className={styles.ctaBanner} data-reveal>
           <h2 className={styles.ctaTitle}>Breathe With Confidence Today</h2>
@@ -506,7 +725,7 @@ export default function LandingPage({ onSwitchToHowItWorks }) {
             <button
               type="button"
               className={styles.primaryCtaBtn}
-              onClick={() => onSwitchToHowItWorks?.()}
+              onClick={() => onSwitchToRegister?.()}
             >
               Get Started Now
             </button>

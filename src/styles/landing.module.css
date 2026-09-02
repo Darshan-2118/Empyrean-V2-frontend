@@ -194,10 +194,12 @@
   transform: translateX(-50%) translateY(var(--orb-y, 0px)) scale(var(--orb-scale, 1));
   width: min(80vh, 820px);
   height: min(80vh, 820px);
-  z-index: 0;
+  /* z-index 5 keeps badges (children) above the features section (z-index 1) */
+  z-index: 5;
   pointer-events: none;
   will-change: transform;
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: visible;
 }
 
 /* Concentric outer ring — sits just outside the orb with a gap, extra white */
@@ -259,12 +261,15 @@
   z-index: 1;
   padding-top: 38vh;
   padding-bottom: 14rem;
-  /* Orb geometry shared by the feature-ball placement below: radius is
-     min(40vh, 410px) and the centre sits 38vh below the hero's bottom edge
-     (i.e. 2vh above the top of this section when the orb is at 80vh).
-     The balls orbit on --orbit-r, well OUTSIDE the orb and its white outer
-     ring (the ring's outer edge sits at orb radius + 26px). */
+  /* Orb geometry:
+     - The orb is anchored bottom: -38vh inside .hero (height: calc(100vh - 80px)).
+     - So the orb bottom edge sits 38vh below hero's bottom = 38vh below this
+       section's top edge.
+     - Orb radius = min(40vh, 410px), so the orb CENTRE is at:
+         top = 38vh - orb-r  (from this section's top).
+     - Badges orbit at --orbit-r = orb-r + 88px from the orb centre. */
   --orb-r: min(40vh, 410px);
+  --orb-cx: 50vw;
   --orb-cy: calc(38vh - var(--orb-r));
   --orbit-r: calc(var(--orb-r) + 88px);
 }
@@ -285,41 +290,58 @@
   z-index: 2;
 }
 
-/* ===== Feature balls on the orb's lower semicircle =====
-   Each ball's centre rides on --orbit-r (orb radius + 88px), which sits
-   clearly OUTSIDE the orb AND its white outer ring. The -38px offsets centre
-   the 76px balls on that radius. pos0/pos5 are the right/left of the orb,
-   pos1/pos4 the lower-right/left, pos2/pos3 the bottom-right/left. Labels
-   are placed radially outside the circle so no text sits inside the orb. */
+/* ===== Feature balls on the orb's outer ring =====
+   Badges are children of .orbWrap so they scale with the orb automatically.
 
+   All 6 badges stay on the LOWER semicircle (no badges above the equator).
+   Gap formula: orbit_offset = 22px (ring) + 30px (gap) + 38px (badge half) = 90px
+
+   Badge top-left formula (θ measured clockwise from 3 o’clock):
+     left = 50% + cos(θ)×50% + cos(θ)×90px − 38px
+     top  = 50% + sin(θ)×50% + sin(θ)×90px − 38px
+
+   Pre-computed positions (lower semicircle, 36° steps):
+     pos0  θ=0°    cos=1,      sin=0      → right equator
+     pos1  θ=36°   cos=0.809,  sin=0.588  → lower-right
+     pos2  θ=72°   cos=0.309,  sin=0.951  → bottom-right
+     pos3  θ=108°  cos=-0.309, sin=0.951  → bottom-left
+     pos4  θ=144°  cos=-0.809, sin=0.588  → lower-left
+     pos5  θ=180°  cos=-1,     sin=0      → left equator    */
+
+/* pos0 — right equator (3 o’clock) */
 .orbitPos0 {
-  left: calc(50vw + var(--orbit-r) - 38px);
-  top: calc(var(--orb-cy) - 38px);
+  left: calc(100% + 52px);
+  top:  calc(50% - 38px);
 }
 
+/* pos1 — lower-right (~4:30) */
 .orbitPos1 {
-  left: calc(50vw + 0.809 * var(--orbit-r) - 38px);
-  top: calc(var(--orb-cy) + 0.588 * var(--orbit-r) - 38px);
+  left: calc(90.45% + 34.81px);
+  top:  calc(79.4% + 14.92px);
 }
 
+/* pos2 — bottom-right (~5:30) */
 .orbitPos2 {
-  left: calc(50vw + 0.309 * var(--orbit-r) - 38px);
-  top: calc(var(--orb-cy) + 0.951 * var(--orbit-r) - 38px);
+  left: calc(65.45% - 10.19px);
+  top:  calc(97.55% + 47.59px);
 }
 
+/* pos3 — bottom-left (~6:30) */
 .orbitPos3 {
-  left: calc(50vw - 0.309 * var(--orbit-r) - 38px);
-  top: calc(var(--orb-cy) + 0.951 * var(--orbit-r) - 38px);
+  left: calc(34.55% - 65.81px);
+  top:  calc(97.55% + 47.59px);
 }
 
+/* pos4 — lower-left (~7:30) */
 .orbitPos4 {
-  left: calc(50vw - 0.809 * var(--orbit-r) - 38px);
-  top: calc(var(--orb-cy) + 0.588 * var(--orbit-r) - 38px);
+  left: calc(9.55% - 110.81px);
+  top:  calc(79.4% + 14.92px);
 }
 
+/* pos5 — left equator (9 o’clock) */
 .orbitPos5 {
-  left: calc(50vw - var(--orbit-r) - 38px);
-  top: calc(var(--orb-cy) - 38px);
+  left: calc(-128px);
+  top:  calc(50% - 38px);
 }
 
 /* Labels sit radially outside the circle, away from the orb */
@@ -336,33 +358,58 @@
   letter-spacing: 0.03em;
 }
 
-/* Right-side balls: text to the right of the badge */
-.orbitPos0 .featureLabel,
-.orbitPos1 .featureLabel {
-  left: calc(100% + 1rem);
+/* pos0 (right equator): label to the right */
+.orbitPos0 .featureLabel {
+  left: calc(100% + 0.8rem);
   top: 50%;
   transform: translateY(-50%);
   text-align: left;
-  width: 10rem;
+  width: 9rem;
 }
 
-/* Bottom balls: text below the badge */
-.orbitPos2 .featureLabel,
+/* pos1 (lower-right ~4:30): label to the right */
+.orbitPos1 .featureLabel {
+  left: calc(100% + 0.8rem);
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: left;
+  width: 9rem;
+}
+
+/* pos2 (bottom-right ~5:30): label below */
+.orbitPos2 .featureLabel {
+  top: calc(100% + 0.75rem);
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  width: 9rem;
+}
+
+/* pos3 (bottom-left ~6:30): label below */
 .orbitPos3 .featureLabel {
   top: calc(100% + 0.75rem);
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
+  width: 9rem;
 }
 
-/* Left-side balls: text to the left of the badge */
-.orbitPos4 .featureLabel,
-.orbitPos5 .featureLabel {
-  right: calc(100% + 1rem);
+/* pos4 (lower-left ~7:30): label to the left */
+.orbitPos4 .featureLabel {
+  right: calc(100% + 0.8rem);
   top: 50%;
   transform: translateY(-50%);
   text-align: right;
-  width: 10rem;
+  width: 9rem;
+}
+
+/* pos5 (left equator): label to the left */
+.orbitPos5 .featureLabel {
+  right: calc(100% + 0.8rem);
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: right;
+  width: 9rem;
 }
 
 .featureBadge {
@@ -582,6 +629,48 @@
   }
 }
 
+/* ===== See More button ===== */
+
+.seeMoreWrap {
+  display: flex;
+  justify-content: flex-end;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.seeMoreBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: rgba(12, 42, 34, 0.7);
+  border: 1px solid rgba(74, 222, 156, 0.45);
+  color: #4ade9c;
+  font-family: 'Gugi', sans-serif;
+  font-size: 0.92rem;
+  letter-spacing: 0.14em;
+  padding: 0.85rem 2.4rem;
+  border-radius: 999px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px rgba(74, 222, 156, 0.12), 0 4px 16px rgba(0,0,0,0.3);
+  transition: background 0.25s ease, border-color 0.25s ease,
+              box-shadow 0.25s ease, transform 0.2s ease;
+}
+
+.seeMoreBtn:hover {
+  background: rgba(74, 222, 156, 0.12);
+  border-color: #4ade9c;
+  box-shadow: 0 0 32px rgba(74, 222, 156, 0.25), 0 8px 24px rgba(0,0,0,0.35);
+  transform: translateY(-2px);
+}
+
+.seeMoreBtn:active {
+  transform: translateY(0);
+}
+
 /* ===== General Section Styling ===== */
 .sectionContainer {
   position: relative;
@@ -782,6 +871,11 @@
   border: 1px solid rgba(143, 174, 159, 0.3);
 }
 
+.featureIconBadge svg {
+  width: 26px;
+  height: 26px;
+}
+
 /* ===== Live Map Preview Card ===== */
 .mapPreviewBox {
   background: rgba(10, 31, 31, 0.85);
@@ -892,6 +986,7 @@
   padding: 4rem 2rem;
   text-align: center;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  margin-top: 30px;
 }
 
 .ctaTitle {

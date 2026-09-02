@@ -1,251 +1,246 @@
-import React, { useState, useEffect } from 'react';
-import styles from '../styles/login.module.css';
+import React, { useEffect, useRef, useState } from "react";
+import styles from "../styles/Features.module.css";
 
-const INITIAL_FEATURES = [
+import realTimeIcon from "../assets/landing/real-time.svg";
+import locationIcon from "../assets/landing/location-tracking.svg";
+import secureIcon from "../assets/landing/secure-data.svg";
+import notificationIcon from "../assets/landing/notification.svg";
+import trendsIcon from "../assets/landing/trends.svg";
+import batteryIcon from "../assets/landing/battery.svg";
+import profileIcon from "../assets/landing/Profile-icon.svg";
+import trackingIcon from "../assets/landing/Tracking.svg";
+
+/* ===== Core capabilities shipped with Empyrean ===== */
+
+const FEATURES = [
   {
-    id: 1,
+    num: "01",
+    icon: realTimeIcon,
     title: "Real-Time Tracking",
-    desc: "A wearable device with ESP32, MQ135 gas sensor, and GPS that captures exactly what you breathe.",
-    icon: "📡",
-    color: "#4cdbaf"
+    text: "A wearable device with ESP32, MQ135 gas sensor, and GPS that captures exactly what you breathe — every second, wherever you go.",
   },
   {
-    id: 2,
+    num: "02",
+    icon: profileIcon,
     title: "Health Modes",
-    desc: "Asthma, Child, and Elderly modes recalibrate danger thresholds specifically to your body.",
-    icon: "🫀",
-    color: "#ff6b6b"
+    text: "Asthma, Child, and Elderly modes recalibrate danger thresholds specifically to your body and your condition.",
   },
   {
-    id: 3,
+    num: "03",
+    icon: batteryIcon,
     title: "Smart AQI Engine",
-    desc: "Fuzzy inference converts raw sensor data into a clear 0–100 AQI score right on the device.",
-    icon: "🧠",
-    color: "#4dabf7"
+    text: "Fuzzy inference converts raw sensor data into a clear 0–100 AQI score right on the device — no guessing, no apps required.",
   },
   {
-    id: 4,
+    num: "04",
+    icon: locationIcon,
     title: "Live Geo-Visualization",
-    desc: "An interactive Leaflet map paints your route green-to-red, showing safe zones vs. hotspots.",
-    icon: "🗺️",
-    color: "#ffd43b"
+    text: "An interactive Leaflet map paints your route green-to-red, showing safe zones vs. hotspots as you move.",
   },
   {
-    id: 5,
+    num: "05",
+    icon: notificationIcon,
     title: "Multi-Modal Alerts",
-    desc: "Buzzer, LED, and push notifications, tiered by severity, so you're warned instantly.",
-    icon: "🔔",
-    color: "#ff922b"
+    text: "Buzzer, LED, and push notifications, tiered by severity, so you're warned instantly — even before symptoms appear.",
   },
   {
-    id: 6,
+    num: "06",
+    icon: trendsIcon,
     title: "Analytics Dashboard",
-    desc: "Daily/weekly exposure trends and anomaly detection for you and your healthcare provider.",
-    icon: "📊",
-    color: "#cc5de8"
+    text: "Daily and weekly exposure trends plus anomaly detection, shared with you and your healthcare provider in one view.",
   },
   {
-    id: 7,
+    num: "07",
+    icon: trackingIcon,
     title: "Smart-City Contribution",
-    desc: "Anonymized crowd data builds city-wide heatmaps for planners and public health authorities.",
-    icon: "🏙️",
-    color: "#20c997"
-  }
+    text: "Anonymized crowd data builds city-wide heatmaps for planners and public-health authorities.",
+  },
 ];
 
-export default function FeaturesPage({ onSwitchToLogin }) {
-  const [activeIndex, setActiveIndex] = useState(0);
+/* ===== The three pillars of the product ===== */
 
-  const handleNext = () => {
-    setActiveIndex((prev) => (prev + 1) % INITIAL_FEATURES.length);
-  };
+const PILLARS = [
+  {
+    name: "Personal Protection",
+    meta: "built around you",
+    desc: "Empyrean is first a health device. It measures the air in your immediate bubble and protects you the moment conditions turn risky — using thresholds tuned to you, not a city average.",
+    bullets: [
+      "Wearable real-time sensor keeps you covered everywhere",
+      "Health-specific threshold profiles for Asthma, Child & Elderly",
+      "Tiered buzzer, LED, and push alerts the second danger appears",
+    ],
+  },
+  {
+    name: "Intelligent Insight",
+    meta: "data made decidable",
+    desc: "Raw sensor noise is turned into decisions humans can act on. A fuzzy AQI engine scores the air, and the dashboard turns readings into trends a doctor can actually read.",
+    bullets: [
+      "Fuzzy-inference AQI scoring straight on the device",
+      "Live map that paints safe zones vs. hotspots",
+      "Exposure trends and anomaly detection you can share",
+    ],
+  },
+  {
+    name: "Community Impact",
+    meta: "your data, crowdsourced",
+    desc: "Every anonymized reading contributes to a shared picture of the city. What protects you personally also warns your neighbourhood and informs the planners who shape it.",
+    bullets: [
+      "Crowd-sourced city-wide air quality heatmaps",
+      "Anonymized data that can never be traced back to you",
+      "Trusted inputs for urban planners and public health",
+    ],
+  },
+];
 
-  const handlePrev = () => {
-    setActiveIndex((prev) => (prev - 1 + INITIAL_FEATURES.length) % INITIAL_FEATURES.length);
-  };
+export default function FeaturesPage({ onSwitchToLogin, onSwitchToRegister }) {
+  const pageRef = useRef(null);
+  const [active, setActive] = useState(0);
+  const current = PILLARS[active];
 
+  // Scroll-reveal: fade elements up as they enter the viewport.
   useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % INITIAL_FEATURES.length);
-    }, 3000);
-    return () => clearInterval(timer);
-  }, []);
+    const root = pageRef.current;
+    if (!root) return undefined;
+
+    const revealEls = root.querySelectorAll("[data-reveal]");
+    if (!revealEls.length) return undefined;
+
+    // Fallback for browsers without IntersectionObserver — show everything.
+    if (!("IntersectionObserver" in window)) {
+      revealEls.forEach((el) => el.classList.add(styles.revealed));
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add(styles.revealed);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -48px 0px" },
+    );
+
+    revealEls.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [styles.revealed]);
 
   return (
-    <div className={styles.pageContainer} style={{ overflowY: 'auto' }}>
-      <div className={styles.mainContainer} style={{ padding: '3rem 2rem 4rem 2rem' }}>
-        <div 
-          className={styles.glassCard} 
-          style={{ width: '100%', maxWidth: '1150px', height: 'auto', minHeight: '650px', padding: '4rem 2rem', display: 'flex', flexWrap: 'wrap', gap: '4rem', alignItems: 'center', justifyContent: 'center' }}
-        >
-          {/* Left Side: Typography and Controls */}
-          <div style={{ flex: '1 1 350px', zIndex: 2, paddingLeft: '2rem' }}>
-            <h2 style={{ color: '#4cdbaf', fontFamily: "'Space Grotesk', sans-serif", fontSize: '1.2rem', letterSpacing: '2px', marginBottom: '1rem', textTransform: 'uppercase' }}>
-              Core Capabilities
-            </h2>
-            <h1 className={styles.brandName} style={{ fontSize: '3.2rem', marginBottom: '1.5rem', lineHeight: '1.1', textTransform: 'none', letterSpacing: '1px' }}>
-              Next-Gen <br /> <span style={{ color: 'rgba(255,255,255,0.7)' }}>Air Quality</span>
-            </h1>
-            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1.1rem', lineHeight: '1.7', marginBottom: '3rem', maxWidth: '400px' }}>
-              We seamlessly connect advanced hardware sensors with intelligent cloud analytics. Explore the features that make Empyrean a life-saving tool.
-            </p>
-            
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <button 
-                onClick={handlePrev}
-                style={{ 
-                  background: 'rgba(255,255,255,0.05)', 
-                  border: '1px solid rgba(255,255,255,0.1)', 
-                  borderRadius: '50%', 
-                  width: '50px', 
-                  height: '50px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  color: 'white',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)' }}
+    <div className={styles.pageContainer} ref={pageRef}>
+      {/* Glowing background accents */}
+      <div className={styles.glowBlob1}></div>
+      <div className={styles.glowBlob2}></div>
+
+      <div className={styles.page}>
+        {/* Hero */}
+        <header className={styles.hero}>
+          <p className={styles.eyebrow}>Empyrean</p>
+          <h1 className={styles.heroTitle}>Features</h1>
+          <p className={styles.heroSubtitle}>
+            Empyrean connects advanced hardware sensors with intelligent cloud
+            analytics. Explore the capabilities that turn raw air readings into
+            a life-saving, personal health tool.
+          </p>
+        </header>
+
+        {/* Core capabilities */}
+        <section data-reveal className={`${styles.section} ${styles.reveal}`}>
+          <h2 className={styles.sectionTitle}>Core Capabilities</h2>
+          <p className={styles.sectionSubtitle}>
+            Seven features, one purpose — protecting your lungs with data that
+            is personal, precise, and actionable.
+          </p>
+
+          <div className={styles.featureGrid}>
+            {FEATURES.map((feature, index) => (
+              <div
+                key={feature.num}
+                data-reveal
+                className={`${styles.featureCard} ${styles.reveal}`}
+                style={{ "--reveal-delay": `${(index % 3) * 110}ms` }}
               >
-                ←
-              </button>
-              <button 
-                onClick={handleNext}
-                style={{ 
-                  background: '#4cdbaf', 
-                  border: 'none', 
-                  borderRadius: '50%', 
-                  width: '50px', 
-                  height: '50px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  color: '#0B2F28',
-                  fontSize: '1.2rem',
-                  fontWeight: 'bold',
-                  boxShadow: '0 4px 15px rgba(76, 219, 175, 0.4)',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
-              >
-                →
-              </button>
+                <span className={styles.featureNum}>{feature.num}</span>
+                <img
+                  src={feature.icon}
+                  alt=""
+                  className={styles.featureIcon}
+                />
+                <h3 className={styles.featureTitle}>{feature.title}</h3>
+                <p className={styles.featureText}>{feature.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Three pillars — interactive selector */}
+        <section data-reveal className={`${styles.section} ${styles.reveal}`}>
+          <h2 className={styles.sectionTitle}>Three Pillars</h2>
+          <p className={styles.sectionSubtitle}>
+            Every Empyrean feature maps to one of three pillars — protection,
+            insight, or collective impact. Pick a pillar to see how they work
+            together.
+          </p>
+
+          <div className={styles.pillarSelector}>
+            <div className={styles.pillarTabs} role="tablist">
+              {PILLARS.map((pillar, index) => (
+                <button
+                  key={pillar.name}
+                  type="button"
+                  role="tab"
+                  aria-selected={active === index}
+                  className={`${styles.pillarTab} ${active === index ? styles.pillarTabActive : ""
+                    }`}
+                  onClick={() => setActive(index)}
+                >
+                  {pillar.name}
+                </button>
+              ))}
             </div>
 
-            {typeof onSwitchToLogin === 'function' && (
-              <div className={styles.footerLinks} style={{ marginTop: '2.5rem' }}>
-                <span className={styles.secondaryActionText}>
-                  Already have an account?{' '}
-                  <a
-                    href="#login"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      onSwitchToLogin();
-                    }}
-                  >
-                    Log in
-                  </a>
-                </span>
+            <div className={styles.pillarPanel} role="tabpanel">
+              <div className={styles.panelHead}>
+                <h3 className={styles.pillarName}>{current.name}</h3>
+                <span className={styles.panelMeta}>{current.meta}</span>
               </div>
+
+              <p className={styles.pillarDesc}>{current.desc}</p>
+
+              <div className={styles.pillarBullets}>
+                {current.bullets.map((bullet) => (
+                  <span key={bullet} className={styles.pillarBullet}>
+                    {bullet}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section data-reveal className={`${styles.cta} ${styles.reveal}`}>
+          <div className={styles.ctaGlow}></div>
+          <h2 className={styles.ctaTitle}>Ready to breathe smarter?</h2>
+          <p className={styles.ctaText}>
+            Create your Empyrean account, set your health profile, and start
+            using every feature today.
+          </p>
+          <div className={styles.ctaButtons}>
+            {typeof onSwitchToRegister === "function" && (
+              <button
+                type="button"
+                className={styles.primaryButton}
+                onClick={() => onSwitchToRegister()}
+              >
+                Get Started
+              </button>
             )}
+
           </div>
-
-          {/* Right Side: Stacking Cards */}
-          <div style={{ flex: '1 1 420px', position: 'relative', height: '480px', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2 }}>
-            {INITIAL_FEATURES.map((card, i) => {
-              const relativeIndex = (i - activeIndex + INITIAL_FEATURES.length) % INITIAL_FEATURES.length;
-              const isTop = relativeIndex === 0;
-              
-              let yOffset = 0;
-              let scale = 1;
-              let opacity = 0;
-              let zIndex = INITIAL_FEATURES.length - relativeIndex;
-
-              if (relativeIndex === 0) {
-                yOffset = 0;
-                scale = 1;
-                opacity = 1;
-              } else if (relativeIndex === 1) {
-                yOffset = 40;
-                scale = 0.95;
-                opacity = 0.8;
-              } else if (relativeIndex === 2) {
-                yOffset = 80;
-                scale = 0.9;
-                opacity = 0.5;
-              } else {
-                yOffset = 120;
-                scale = 0.85;
-                opacity = 0;
-              }
-
-              // The card that just left (moved to the end of the stack) floats up and fades
-              if (relativeIndex === INITIAL_FEATURES.length - 1) {
-                yOffset = -50;
-                scale = 1.05;
-                opacity = 0;
-                zIndex = INITIAL_FEATURES.length + 1; // Stay on top while fading out
-              }
-
-              return (
-                <div 
-                  key={card.id}
-                  onClick={() => !isTop && handleNext()}
-                  style={{
-                    position: 'absolute',
-                    width: '100%',
-                    maxWidth: '480px',
-                    height: '350px',
-                    background: 'rgba(20, 40, 35, 0.85)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderRadius: '24px',
-                    border: `1px solid ${isTop ? card.color : 'rgba(255, 255, 255, 0.08)'}`,
-                    padding: '3rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    boxShadow: isTop ? `0 20px 50px rgba(0,0,0,0.5), 0 0 30px ${card.color}15` : '0 10px 30px rgba(0,0,0,0.3)',
-                    transform: `translateY(${yOffset}px) scale(${scale})`,
-                    opacity: opacity,
-                    zIndex: zIndex,
-                    transition: 'all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)',
-                    cursor: isTop ? 'default' : 'pointer',
-                    pointerEvents: relativeIndex > 2 && relativeIndex !== INITIAL_FEATURES.length - 1 ? 'none' : 'auto'
-                  }}
-                >
-                  <div style={{ fontSize: '4rem', marginBottom: '1.2rem', filter: isTop ? 'drop-shadow(0 0 10px rgba(255,255,255,0.2))' : 'none', transition: 'all 0.6s ease' }}>
-                    {card.icon}
-                  </div>
-                  <h3 style={{ color: '#fff', fontSize: '1.7rem', margin: '0 0 1rem 0', fontFamily: "'Space Grotesk', sans-serif", fontWeight: '600' }}>
-                    {card.title}
-                  </h3>
-                  <p style={{ color: 'rgba(255,255,255,0.7)', margin: 0, lineHeight: '1.7', fontSize: '1.15rem' }}>
-                    {card.desc}
-                  </p>
-
-                  {/* Aesthetic glowing dot in the corner */}
-                  {isTop && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '2rem',
-                      right: '2rem',
-                      width: '10px',
-                      height: '10px',
-                      borderRadius: '50%',
-                      background: card.color,
-                      boxShadow: `0 0 15px ${card.color}`
-                    }} />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        </section>
       </div>
     </div>
   );
