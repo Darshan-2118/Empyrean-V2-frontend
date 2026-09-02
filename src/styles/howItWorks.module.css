@@ -843,6 +843,7 @@
 
 /* ===== Responsive ===== */
 
+/* mobile responsive design */
 @media (max-width: 768px) {
   .navbar {
     gap: 1.2rem;

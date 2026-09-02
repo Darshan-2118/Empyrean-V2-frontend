@@ -1,15 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { Menu, X } from "lucide-react";
 import styles from "../styles/Navbar.module.css";
 import empyreanLogo from "../assets/landing/final-logo.svg";
 
-/*
- * Shared navbar rendered once at the top of every page.
- * Brand (logo + name) on the left always routes home; the page links are the
- * single source of navigation between pages. On the landing page the inline
- * sections are reused for smooth one-page scrolling, and the URL is updated
- * with a matching hash so deep links work; on any other page the links
- * navigate to their dedicated route.
- */
 const NAV = [
   { label: "Home", path: "landing" },
   { label: "How it works?", path: "howItWorks" },
@@ -18,7 +11,6 @@ const NAV = [
   { label: "About", path: "about" },
 ];
 
-/* Landing-page section id served by each nav target when on the landing page. */
 const LANDING_SECTIONS = {
   landing: "home",
   howItWorks: "howItWorks",
@@ -27,7 +19,6 @@ const LANDING_SECTIONS = {
   about: "about",
 };
 
-/* Reverse mapping: section id -> nav path, for the landing scroll-spy. */
 const SECTION_PATHS = {
   home: "landing",
   howItWorks: "howItWorks",
@@ -36,14 +27,12 @@ const SECTION_PATHS = {
   about: "about",
 };
 
-/* Distance from the top at which a section counts as the current one. */
 const SCROLL_SPY_OFFSET = 120;
 
 export default function Navbar({ active, onNavigate, auth }) {
   const [landingSection, setLandingSection] = useState("home");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Scroll-spy: while on the landing page, keep the matching nav item active
-  // (with its underline animation) as the user scrolls between sections.
   useEffect(() => {
     if (active !== "landing") {
       setLandingSection("home");
@@ -82,9 +71,11 @@ export default function Navbar({ active, onNavigate, auth }) {
   const displayActive = active === "landing" ? SECTION_PATHS[landingSection] : active;
   const go = (path) => (e) => {
     e.preventDefault();
-    // Navigate to the page route
+    setIsSidebarOpen(false);
     onNavigate?.(path);
   };
+
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
     <nav className={styles.navbar}>
@@ -98,56 +89,120 @@ export default function Navbar({ active, onNavigate, auth }) {
         <span className={styles.logoText}>EMPYREAN</span>
       </a>
 
-      <div className={styles.links}>
-        {NAV.map((item) =>
-          item.disabled ? (
-            <a
-              key={item.label}
-              href="#map"
-              className={styles.disabled}
-              aria-disabled="true"
-              role="link"
-              onClick={(e) => e.preventDefault()}
-            >
-              {item.label}
-            </a>
+      {/* Desktop Links */}
+      <div className={styles.desktopLinks}>
+        <div className={styles.links}>
+          {NAV.map((item) =>
+            item.disabled ? (
+              <a
+                key={item.label}
+                href="#map"
+                className={styles.disabled}
+                aria-disabled="true"
+                role="link"
+                onClick={(e) => e.preventDefault()}
+              >
+                {item.label}
+              </a>
+            ) : (
+              <a
+                key={item.label}
+                href={'#' + item.path}
+                className={item.path === displayActive ? styles.navActive : undefined}
+                onClick={go(item.path)}
+              >
+                {item.label}
+              </a>
+            ),
+          )}
+        </div>
+
+        <div className={styles.authActions}>
+          {auth?.isAuthenticated ? (
+            <span className={styles.authUser}>
+              {auth.user?.username ?? "Account"}
+            </span>
           ) : (
-            <a
-              key={item.label}
-              href={`#${item.path}`}
-              className={item.path === displayActive ? styles.navActive : undefined}
-              onClick={go(item.path)}
-            >
-              {item.label}
-            </a>
-          ),
-        )}
+            <>
+              <button
+                type="button"
+                className={styles.authBtn}
+                onClick={() => { setIsSidebarOpen(false); onNavigate?.("login"); }}
+              >
+                Login
+              </button>
+              <button
+                type="button"
+                className={styles.authBtn + ' ' + styles.authBtnPrimary}
+                onClick={() => { setIsSidebarOpen(false); onNavigate?.("register"); }}
+              >
+                Register
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
-      <div className={styles.authActions}>
-        {auth?.isAuthenticated ? (
-          <span className={styles.authUser}>
-            {auth.user?.username ?? "Account"}
-          </span>
-        ) : (
-          <>
-            <button
-              type="button"
-              className={styles.authBtn}
-              onClick={() => onNavigate?.("login")}
-            >
-              Login
-            </button>
-            <button
-              type="button"
-              className={`${styles.authBtn} ${styles.authBtnPrimary}`}
-              onClick={() => onNavigate?.("register")}
-            >
-              Register
-            </button>
-          </>
-        )}
+      {/* Mobile Hamburger */}
+      <button className={styles.hamburger} onClick={toggleSidebar} aria-label="Toggle Menu">
+        {isSidebarOpen ? <X size={28} /> : <Menu size={28} />}
+      </button>
+
+      {/* Mobile Sidebar */}
+      <div className={styles.sidebar + ' ' + (isSidebarOpen ? styles.sidebarOpen : '')}>
+        <div className={styles.sidebarLinks}>
+          {NAV.map((item) =>
+            item.disabled ? (
+              <a
+                key={item.label}
+                href="#map"
+                className={styles.disabled}
+                aria-disabled="true"
+                role="link"
+                onClick={(e) => e.preventDefault()}
+              >
+                {item.label}
+              </a>
+            ) : (
+              <a
+                key={item.label}
+                href={'#' + item.path}
+                className={item.path === displayActive ? styles.navActive : undefined}
+                onClick={go(item.path)}
+              >
+                {item.label}
+              </a>
+            ),
+          )}
+        </div>
+        <div className={styles.sidebarAuth}>
+          {auth?.isAuthenticated ? (
+            <span className={styles.authUser}>
+              {auth.user?.username ?? "Account"}
+            </span>
+          ) : (
+            <>
+              <button
+                type="button"
+                className={styles.authBtn}
+                onClick={() => { setIsSidebarOpen(false); onNavigate?.("login"); }}
+              >
+                Login
+              </button>
+              <button
+                type="button"
+                className={styles.authBtn + ' ' + styles.authBtnPrimary}
+                onClick={() => { setIsSidebarOpen(false); onNavigate?.("register"); }}
+              >
+                Register
+              </button>
+            </>
+          )}
+        </div>
       </div>
+      
+      {/* Overlay for sidebar */}
+      {isSidebarOpen && <div className={styles.overlay} onClick={() => setIsSidebarOpen(false)}></div>}
     </nav>
   );
 }

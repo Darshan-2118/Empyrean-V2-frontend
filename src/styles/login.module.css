@@ -538,12 +538,14 @@
   gap: 1.5rem;
 }
 
+/* mobile responsive design */
 @media (min-width: 768px) {
   .teamGrid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
+/* mobile responsive design */
 @media (min-width: 1024px) {
   .teamGrid {
     grid-template-columns: repeat(4, 1fr);
@@ -554,45 +556,72 @@
    Preserve the desktop two-column layout above this breakpoint; below it,
    stack the glass card vertically so auth pages work on small screens. */
 
+/* mobile responsive design */
 @media (max-width: 860px) {
   .pageContainer {
     overflow-x: hidden;
   }
 
+  .mainContainer {
+    padding: 2rem 1rem 3rem;
+  }
+
   .glassCard {
     flex-direction: column;
-    width: min(90%, 480px);
+    width: min(95%, 480px);
     min-height: 0;
     max-height: none;
+    border-radius: 30px;
   }
 
+  /* Login Page Panels */
   .leftPanel {
     width: 100%;
+    box-sizing: border-box !important;
     border-radius: 30px 30px 0 0;
     transform: none;
-    padding: 2rem 1.5rem 1.5rem;
-  }
-
-  .logoWrapper {
-    width: 180px;
-    height: 180px;
-    margin-bottom: 0.5rem;
-  }
-
-  .brandName {
-    font-size: 1.8rem;
-    letter-spacing: 3px;
+    padding: 3rem 1.5rem;
   }
 
   .rightPanel {
     width: 100%;
-    padding: 2rem 1.5rem;
+    box-sizing: border-box !important;
+    padding: 3rem 1.5rem;
     border-radius: 0 0 30px 30px;
   }
 
+  /* Register & Forgot Password Panels */
+  /* These are reversed in the DOM compared to login (form is first, then brand) */
+  .formPanel {
+    width: 100%;
+    box-sizing: border-box !important;
+    border-radius: 30px 30px 0 0;
+    padding: 3rem 1.5rem;
+    transform: none;
+  }
+  
+  .brandPanel {
+    width: 100%;
+    box-sizing: border-box !important;
+    border-radius: 0 0 30px 30px;
+    padding: 3rem 1.5rem;
+    transform: none;
+  }
+
+  .logoWrapper {
+    width: 160px;
+    height: 160px;
+    margin-bottom: 1rem;
+  }
+
+  .brandName {
+    font-size: 2rem;
+    letter-spacing: 3px;
+  }
+
   .welcomeText {
-    font-size: 1.5rem;
-    margin-top: 1rem;
+    font-size: 1.8rem;
+    margin-top: 0;
   }
 
   .subtitleText {
@@ -600,7 +629,81 @@
   }
 
   .form {
-    gap: 1.5rem;
+    gap: 1.25rem;
+  }
+  
+  .registerForm {
+    gap: 1rem;
+  }
+
+  .loginButton {
+    width: 60%;
+    align-self: center;
+  }
+
+  .footerLinks {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .brandSlide,
+  .formSlide,
+  .logoSlide,
+  .formSlideRight {
+    animation: none !important;
+  }
+
+  .brandPanel {
+    display: none !important;
+  }
+
+  .formPanel {
+    border-radius: 30px !important;
+  }
+
+  .helperText {
+    text-align: center;
+    padding: 0 1rem;
+    margin-top: 1rem;
+    line-height: 1.4;
+  }
+
+  .secondaryActionText {
+    display: block;
+    text-align: center;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .inputGroup input,
+  .inputGroup select {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .form,
+  .registerForm {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .inputGroup {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch !important;
+    margin: 0 !important;
   }
 }
-

@@ -81,7 +81,7 @@ export default function AccountSettings({ user, activeProfile, onProfileChange, 
           <h3>Account Information</h3>
         </div>
         <div className="settings-list">
-          <div className="setting-item" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '24px', padding: '24px', borderBottom: 'none' }}>
+          <div className="setting-item" style={{ flexDirection: 'column', alignItems: 'flex-start', borderBottom: 'none' }} id="account-setting-item">
             
             <div className={styles.formContainer}>
               <div>

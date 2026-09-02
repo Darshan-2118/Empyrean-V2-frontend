@@ -511,6 +511,7 @@
 
 /* ===== Responsive ===== */
 
+/* mobile responsive design */
 @media (max-width: 768px) {
   .heroTitle {
     font-size: 2.4rem;

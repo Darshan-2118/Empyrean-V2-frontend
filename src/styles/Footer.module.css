@@ -123,3 +123,14 @@
     padding: 2.5rem 1.25rem 0;
   }
 }
+
+/* mobile responsive design */
+@media (max-width: 480px) {
+  .footerGrid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .linkCol {
+    align-items: center;
+  }
+}

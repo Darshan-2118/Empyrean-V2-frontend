@@ -184,3 +184,48 @@
 .btnLogout:hover {
   color: var(--text-primary);
 }
+
+
+
+
+#account-setting-item {
+  gap: 24px;
+  padding: 24px;
+}
+
+/* mobile responsive design */
+@media (max-width: 768px) {
+  #account-setting-item {
+    gap: 16px !important;
+    padding: 12px 0 !important;
+  }
+
+  .accountWidget {
+    padding: 0 !important;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+  
+  .formContainer {
+    gap: 16px;
+  }
+
+  .pwdChecklist {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .pwdSection {
+    padding: 16px;
+  }
+  
+  .input {
+    font-size: 16px;
+  }
+  
+  .btnSave {
+    padding: 14px 20px;
+    font-size: 1rem;
+  }
+}

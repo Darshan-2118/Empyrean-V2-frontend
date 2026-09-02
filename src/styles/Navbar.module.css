@@ -157,36 +157,95 @@
 
 /* ===== Responsive ===== */
 
+
+/* mobile responsive design */
+.desktopLinks {
+  display: contents;
+}
+.hamburger {
+  display: none;
+}
+.sidebar {
+  display: none;
+}
+.overlay {
+  display: none;
+}
+
 @media (max-width: 860px) {
   .navbar {
     height: auto;
     min-height: var(--nav-h);
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.6rem 1.25rem;
-  }
-
-  .brand {
-    justify-self: center;
-  }
-
-  .logoIcon {
-    height: 34px;
-  }
-
-  .links {
-    justify-self: center;
     flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+  }
+  .desktopLinks {
+    display: none;
+  }
+  
+  .hamburger {
+    display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 1.25rem;
+    background: none;
+    border: none;
+    color: #4cdbaf;
+    cursor: pointer;
+    padding: 0.5rem;
   }
 
-  .links a {
-    font-size: 0.9rem;
+  .sidebar {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background: transparent;
+    padding: 1.5rem 0 1rem;
+    gap: 1.5rem;
+    align-items: center;
   }
 
-  .authActions {
-    justify-self: center;
+  .sidebarOpen {
+    display: flex;
+    
+  }
+
+
+
+  .sidebarLinks {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    align-items: center;
+  }
+
+  .sidebarLinks a {
+    color: #e8f0ec;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  .sidebarLinks a:hover,
+  .sidebarLinks .navActive {
+    color: #4cdbaf;
+  }
+
+  .sidebarAuth {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .sidebarAuth .authBtn {
+    width: 100%;
+    text-align: center;
+    padding: 0.85rem;
+    font-size: 1rem;
   }
 }
