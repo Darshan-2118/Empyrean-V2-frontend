@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Wind, Search, Bell, ChevronDown, User, Users, LogOut, Settings, Cpu,
   LayoutDashboard, Map as MapIcon, BarChart3, Activity, AlertTriangle, CheckCircle,
-  Battery, MapPin, RefreshCw, Plus
+  Battery, MapPin, RefreshCw, Plus, Menu
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { MapContainer, TileLayer, Popup, CircleMarker, useMap } from "react-leaflet";
@@ -104,16 +104,21 @@ function Tooltip({ label, children, position = "bottom" }) {
   );
 }
 
-function IconRailButton({ icon: Icon, label, active, onClick }) {
+function IconRailButton({ icon: Icon, label, active, onClick, open }) {
+  const btn = (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      className={`rail-btn ${active ? "rail-btn--active" : ""} ${open ? "rail-btn--open" : ""}`}
+    >
+      <Icon size={20} strokeWidth={1.8} />
+      {open && <span className="rail-btn__text">{label}</span>}
+    </button>
+  );
+  if (open) return btn;
   return (
     <Tooltip label={label} position="right">
-      <button
-        onClick={onClick}
-        aria-label={label}
-        className={`rail-btn ${active ? "rail-btn--active" : ""}`}
-      >
-        <Icon size={20} strokeWidth={1.8} />
-      </button>
+      {btn}
     </Tooltip>
   );
 }
@@ -363,6 +368,20 @@ function DevicesContent({ nodes, latest }) {
   );
 }
 
+import AccountSettings from './AccountSettings';
+
+function AccountContent({ user, activeProfile, onProfileChange, onSignOut, onHasUnsavedChanges }) {
+  return (
+    <AccountSettings 
+      user={user} 
+      activeProfile={activeProfile} 
+      onProfileChange={onProfileChange} 
+      onSignOut={onSignOut}
+      onHasUnsavedChanges={onHasUnsavedChanges}
+    />
+  );
+}
+
 function SettingsContent({ profile, onTogglePref, activeProfile, onProfileChange }) {
   const prefs = profile?.notification_prefs || {};
 
@@ -562,6 +581,7 @@ function OverviewContent({ reading, history, alerts, onAcknowledge }) {
 
 export default function EmpyreanDashboardLayout({ user, onSignedOut }) {
   const [activeTab, setActiveTab] = useState("overview");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [nodes, setNodes] = useState([]);
   const [latest, setLatest] = useState({});
   const [selectedNodeId, setSelectedNodeId] = useState("");
@@ -571,8 +591,18 @@ export default function EmpyreanDashboardLayout({ user, onSignedOut }) {
   const [healthProfile, setHealthProfile] = useState("asthma");
   const [backendDown, setBackendDown] = useState(false);
   const [toast, setToast] = useState(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [pendingTab, setPendingTab] = useState(null);
   const toastTimer = useRef(null);
   const historySeq = useRef(0);
+
+  const handleTabChange = useCallback((newTab) => {
+    if (hasUnsavedChanges) {
+      setPendingTab(newTab);
+    } else {
+      setActiveTab(newTab);
+    }
+  }, [hasUnsavedChanges]);
 
   const showToast = useCallback((message, kind = "error") => {
     setToast({ message, kind });
@@ -717,31 +747,36 @@ export default function EmpyreanDashboardLayout({ user, onSignedOut }) {
   return (
     <div className="dashboard">
       <header className="dashboard__header">
-        <div className="dashboard__logo">
-          <div className="dashboard__logo-mark"><Wind size={18} color="#fff" strokeWidth={1.8} /></div>
-          <span className="dashboard__logo-text">Empyrean</span>
-        </div>
         <AqiTickerSpace reading={selectedReading} nodeId={selectedNodeId} backendDown={backendDown} />
         <div className="search">
           <Search size={16} color="rgba(255,255,255,0.7)" />
           <input type="text" placeholder="Search areas, devices, alerts" className="search__input" />
         </div>
         <Tooltip label="Notifications"><button className="icon-btn"><Bell size={19} strokeWidth={1.8} /><span className="icon-btn__dot" /></button></Tooltip>
-        <ProfileMenu user={user ?? profile} onSignOut={handleSignOut} onSettings={() => setActiveTab("settings")} />
+        <ProfileMenu user={user ?? profile} onSignOut={handleSignOut} onSettings={() => handleTabChange("account")} />
       </header>
 
       <div className="dashboard__body">
-        <aside className="rail">
+        <aside className={`rail ${isSidebarOpen ? "rail--open" : ""}`}>
+          <div className="rail__logo-container">
+            <button 
+              className="icon-btn" 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              aria-label="Toggle Sidebar"
+            >
+              <Menu size={24} color="#fff" strokeWidth={1.8} />
+            </button>
+          </div>
           <nav className="rail__nav">
-            <IconRailButton icon={LayoutDashboard} label="Overview" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
-            <IconRailButton icon={MapIcon} label="Map (Geo-Visualisation)" active={activeTab === 'map'} onClick={() => setActiveTab('map')} />
-            <IconRailButton icon={BarChart3} label="Analytics" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
+            <IconRailButton icon={LayoutDashboard} label="Overview" active={activeTab === 'overview'} onClick={() => handleTabChange('overview')} open={isSidebarOpen} />
+            <IconRailButton icon={MapIcon} label="Map (Geo-Visualisation)" active={activeTab === 'map'} onClick={() => handleTabChange('map')} open={isSidebarOpen} />
+            <IconRailButton icon={BarChart3} label="Analytics" active={activeTab === 'analytics'} onClick={() => handleTabChange('analytics')} open={isSidebarOpen} />
           </nav>
           <div className="rail__spacer" />
           <div className="rail__bottom">
-            <IconRailButton icon={Cpu} label="Devices" active={activeTab === 'devices'} onClick={() => setActiveTab('devices')} />
+            <IconRailButton icon={Cpu} label="Devices" active={activeTab === 'devices'} onClick={() => handleTabChange('devices')} open={isSidebarOpen} />
             <div className="rail__divider" />
-            <IconRailButton icon={Settings} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
+            <IconRailButton icon={Settings} label="Settings" active={activeTab === 'settings'} onClick={() => handleTabChange('settings')} open={isSidebarOpen} />
           </div>
         </aside>
 
@@ -757,6 +792,15 @@ export default function EmpyreanDashboardLayout({ user, onSignedOut }) {
           {activeTab === "map" && <MapContent nodes={nodes} latest={latest} />}
           {activeTab === "analytics" && <AnalyticsContent history={history} />}
           {activeTab === "devices" && <DevicesContent nodes={nodes} latest={latest} />}
+          {activeTab === "account" && (
+            <AccountContent
+              user={user}
+              activeProfile={healthProfile}
+              onProfileChange={setHealthProfile}
+              onSignOut={handleSignOut}
+              onHasUnsavedChanges={setHasUnsavedChanges}
+            />
+          )}
           {activeTab === "settings" && (
             <SettingsContent
               profile={profile}
@@ -769,6 +813,19 @@ export default function EmpyreanDashboardLayout({ user, onSignedOut }) {
       </div>
 
       <Toast toast={toast} />
+
+      {pendingTab && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, backdropFilter: 'blur(4px)' }}>
+          <div style={{ background: '#0a1914', padding: '24px', borderRadius: '16px', border: '1px solid var(--border-color)', maxWidth: '400px', width: '90%', boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
+            <h4 style={{ margin: '0 0 16px 0', color: 'var(--text-primary)', fontSize: '1.2rem', fontFamily: 'Gugi' }}>Unsaved Changes</h4>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: '1.5' }}>You have unsaved changes. Do you want to leave without saving?</p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button onClick={() => setPendingTab(null)} style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', padding: '10px 20px', borderRadius: '12px', cursor: 'pointer', fontWeight: 500 }}>Stay</button>
+              <button onClick={() => { setHasUnsavedChanges(false); setActiveTab(pendingTab); setPendingTab(null); }} style={{ background: 'var(--danger-color)', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '12px', cursor: 'pointer', fontWeight: 500 }}>Leave Without Saving</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
