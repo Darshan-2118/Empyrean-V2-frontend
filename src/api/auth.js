@@ -18,6 +18,7 @@ export async function register({ username, email, password }) {
 }
 
 export async function login({ username, password }) {
+  // --- REAL BACKEND LOGIN ---
   const data = await apiFetch("/auth/login", {
     method: "POST",
     body: { username, password },
@@ -25,6 +26,7 @@ export async function login({ username, password }) {
   });
   setSession(data);
   return data;
+
 }
 
 // Proposes POST /auth/reset-password — backend endpoint to be added to match.
