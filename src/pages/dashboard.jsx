@@ -12,7 +12,7 @@ import {
   acknowledgeAlert, getProfile, updateProfile, logout, connectAlertsSocket,
   ApiError, getErrorMessage,
 } from "../api";
-import "./EmpyreanDashboardLayout.css";
+import "../styles/EmpyreanDashboardLayout.css";
 
 const DEFAULT_CENTER = [12.9716, 77.5946];
 
