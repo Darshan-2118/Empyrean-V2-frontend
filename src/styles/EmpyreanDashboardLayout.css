@@ -1,6 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Aboreto&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Gugi&family=Aboreto&display=swap');
-
 :root {
   --bg-main: #08201a;
   --bg-secondary: #0c2a22;
@@ -966,4 +963,131 @@ input:checked + .slider {
 input:checked + .slider:before {
   transform: translateX(20px);
   background-color: #08201a;
+}
+
+/* ===== Medium screens (tablets / small laptops) ===== */
+
+@media (max-width: 1100px) {
+  .dashboard {
+    height: calc(100vh - 80px);
+  }
+
+  .search {
+    width: 200px;
+  }
+
+  .overview-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .widget--chart {
+    grid-column: span 2;
+  }
+
+  .widget--sensors {
+    grid-column: span 2;
+  }
+
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .widget--stats {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+/* ===== Mobile screens ===== */
+
+@media (max-width: 768px) {
+  .dashboard {
+    height: calc(100dvh - 80px);
+    overflow-y: auto;
+  }
+
+  .dashboard__header {
+    height: 60px;
+    padding: 0 14px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .dashboard__logo-text {
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+  }
+
+  .ticker {
+    display: none;
+  }
+
+  .search {
+    width: 100%;
+    max-width: 100%;
+    flex: 1;
+  }
+
+  .profile-btn__name,
+  .profile-chevron {
+    display: none;
+  }
+
+  .main {
+    padding: 16px;
+  }
+
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .widget--chart,
+  .widget--sensors {
+    grid-column: span 1;
+  }
+
+  .widget {
+    padding: 18px;
+  }
+
+  .sensor-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .devices-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .device-diagnostics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .profiles-container {
+    grid-template-columns: 1fr;
+  }
+
+  .rail {
+    width: 64px;
+  }
+
+  .rail--open {
+    width: 220px;
+  }
+}
+
+/* ===== Small mobile screens ===== */
+
+@media (max-width: 480px) {
+  .dashboard__logo-text {
+    display: none;
+  }
+
+  .main {
+    padding: 12px;
+  }
+
+  .sensor-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
 }
