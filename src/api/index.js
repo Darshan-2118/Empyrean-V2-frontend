@@ -12,7 +12,14 @@ export {
   refreshSession,
 } from "./client";
 
-export { register, login, refresh, logout, resetPassword } from "./auth";
+export {
+  register,
+  login,
+  refresh,
+  logout,
+  forgotPassword,
+  resetPassword,
+} from "./auth";
 export { getLatestReadings, getReadingsHistory } from "./readings";
 export { getNodes, createNode, updateNode } from "./nodes";
 export { getAlerts, acknowledgeAlert } from "./alerts";

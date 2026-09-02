@@ -1,33 +1,37 @@
 import React, { useEffect, useRef, useState } from "react";
 import styles from "../styles/login.module.css";
 import logoGraphic from "../assets/landing/final-logo.svg";
-import { resetPassword, ApiError, getErrorMessage } from "../api";
+import { forgotPassword, resetPassword, ApiError, getErrorMessage } from "../api";
 
-const FIELD_LABELS = {
-  identifier: "Email or username",
-  password: "New password",
-  confirmPassword: "Confirm password",
-};
+function getResetToken() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("token");
+  return token ? token.trim() : null;
+}
 
 export default function ForgotPasswordPage({
   onResetSuccess,
   onSwitchToLogin,
 }) {
-  const [formData, setFormData] = useState({
-    identifier: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const initialToken = useRef(getResetToken());
+  const hasToken = Boolean(initialToken.current);
+
+  const [formData, setFormData] = useState(() =>
+    hasToken
+      ? { token: initialToken.current, password: "", confirmPassword: "" }
+      : { email: "" },
+  );
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const identifierRef = useRef(null);
+  const [requested, setRequested] = useState(false);
+  const emailRef = useRef(null);
   const passwordRef = useRef(null);
   const confirmPasswordRef = useRef(null);
 
   const fieldRefs = {
-    identifier: identifierRef,
+    email: emailRef,
     password: passwordRef,
     confirmPassword: confirmPasswordRef,
   };
@@ -53,11 +57,18 @@ export default function ForgotPasswordPage({
 
   const handleBlur = (field) => {
     const value = formData[field] || "";
+    const labels = hasToken
+      ? {
+          email: "Email",
+          password: "New password",
+          confirmPassword: "Confirm password",
+        }
+      : { email: "Email", password: "New password", confirmPassword: "Confirm password" };
 
     if (!value) {
       setErrors((prev) => ({
         ...prev,
-        [field]: `${FIELD_LABELS[field]} is required`,
+        [field]: `${labels[field]} is required`,
       }));
       return;
     }
@@ -82,7 +93,9 @@ export default function ForgotPasswordPage({
 
     event.preventDefault();
 
-    const fieldOrder = ["identifier", "password", "confirmPassword"];
+    const fieldOrder = hasToken
+      ? ["password", "confirmPassword"]
+      : ["email"];
     const currentIndex = fieldOrder.indexOf(event.target.name);
     const nextField = fieldOrder[currentIndex + 1];
 
@@ -93,14 +106,45 @@ export default function ForgotPasswordPage({
     }
   };
 
-  const handleSubmit = async (event) => {
+  const handleRequestLink = async (event) => {
+    event.preventDefault();
+    if (submitting || requested) return;
+
+    const newErrors = {};
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    }
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length) {
+      emailRef.current?.focus();
+      return;
+    }
+
+    setSubmitting(true);
+    setMessage("");
+    try {
+      await forgotPassword({ email: formData.email });
+      setRequested(true);
+      setMessage(
+        "If an account exists for that email, a password reset link has been sent.",
+      );
+    } catch (err) {
+      setMessage(getErrorMessage(err));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleResetPassword = async (event) => {
     event.preventDefault();
     if (submitting || success) return;
 
     const newErrors = {};
-    for (const field of Object.keys(FIELD_LABELS)) {
+    for (const field of ["password", "confirmPassword"]) {
       if (!formData[field]) {
-        newErrors[field] = `${FIELD_LABELS[field]} is required`;
+        newErrors[field] =
+          field === "password" ? "New password is required" : "Confirm password is required";
       }
     }
     if (formData.password && formData.password.length < 6) {
@@ -124,7 +168,7 @@ export default function ForgotPasswordPage({
     setMessage("");
     try {
       await resetPassword({
-        identifier: formData.identifier,
+        token: formData.token,
         newPassword: formData.password,
       });
       setSuccess(true);
@@ -145,6 +189,8 @@ export default function ForgotPasswordPage({
 
   useEffect(() => () => clearTimeout(), []);
 
+  const handleSubmit = hasToken ? handleResetPassword : handleRequestLink;
+
   return (
     <div className={styles.pageContainer}>
       <div className={styles.mainContainer}>
@@ -152,71 +198,88 @@ export default function ForgotPasswordPage({
           {/* Form fields on the LEFT */}
           <div className={`${styles.formPanel} ${styles.formSlide}`}>
             <div className={styles.loginFormContainer}>
-              <h2 className={styles.welcomeText}>Reset Password</h2>
+              {!hasToken ? (
+                <h2 className={styles.welcomeText}>Forgot Password</h2>
+              ) : (
+                <h2 className={styles.welcomeText}>Reset Password</h2>
+              )}
               <p className={styles.subtitleText}>
-                Enter your account details and choose a new password.
+                {!hasToken
+                  ? "Enter your account email and we'll send you a reset link."
+                  : "Enter your new password below."}
               </p>
 
               <form
                 onSubmit={handleSubmit}
                 className={`${styles.form} ${styles.forgotForm}`}
               >
-                <div className={styles.inputGroup}>
-                  <label htmlFor="identifier">Email or Username</label>
-                  <input
-                    ref={identifierRef}
-                    type="text"
-                    id="identifier"
-                    name="identifier"
-                    value={formData.identifier}
-                    onChange={handleChange}
-                    onKeyDown={handleKeyDown}
-                    onBlur={() => handleBlur("identifier")}
-                    placeholder="Enter your email or username"
-                  />
-                  <span className={styles.fieldError}>{errors.identifier}</span>
-                </div>
+                {!hasToken ? (
+                  <div className={styles.inputGroup}>
+                    <label htmlFor="email">Email</label>
+                    <input
+                      ref={emailRef}
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      onKeyDown={handleKeyDown}
+                      onBlur={() => handleBlur("email")}
+                      placeholder="Enter your email"
+                      disabled={requested}
+                    />
+                    <span className={styles.fieldError}>{errors.email}</span>
+                  </div>
+                ) : (
+                  <>
+                    <div className={styles.inputGroup}>
+                      <label htmlFor="password">New Password</label>
+                      <input
+                        ref={passwordRef}
+                        type="password"
+                        id="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        onKeyDown={handleKeyDown}
+                        onBlur={() => handleBlur("password")}
+                        placeholder="Enter a new password"
+                      />
+                      <span className={styles.fieldError}>{errors.password}</span>
+                    </div>
 
-                <div className={styles.inputGroup}>
-                  <label htmlFor="password">New Password</label>
-                  <input
-                    ref={passwordRef}
-                    type="password"
-                    id="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    onKeyDown={handleKeyDown}
-                    onBlur={() => handleBlur("password")}
-                    placeholder="Enter a new password"
-                  />
-                  <span className={styles.fieldError}>{errors.password}</span>
-                </div>
-
-                <div className={styles.inputGroup}>
-                  <label htmlFor="confirmPassword">Confirm Password</label>
-                  <input
-                    ref={confirmPasswordRef}
-                    type="password"
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    onKeyDown={handleKeyDown}
-                    onBlur={() => handleBlur("confirmPassword")}
-                    placeholder="Re-enter your new password"
-                  />
-                  <span className={styles.fieldError}>
-                    {errors.confirmPassword}
-                  </span>
-                </div>
+                    <div className={styles.inputGroup}>
+                      <label htmlFor="confirmPassword">Confirm Password</label>
+                      <input
+                        ref={confirmPasswordRef}
+                        type="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        onKeyDown={handleKeyDown}
+                        onBlur={() => handleBlur("confirmPassword")}
+                        placeholder="Re-enter your new password"
+                      />
+                      <span className={styles.fieldError}>
+                        {errors.confirmPassword}
+                      </span>
+                    </div>
+                  </>
+                )}
 
                 <button
                   type="submit"
                   className={styles.loginButton}
-                  disabled={submitting}
+                  disabled={submitting || (hasToken ? success : requested)}
                 >
-                  {submitting ? "Resetting…" : "Reset Password"}
+                  {hasToken
+                    ? submitting
+                      ? "Resetting…"
+                      : "Reset Password"
+                    : submitting
+                      ? "Sending…"
+                      : "Send Reset Link"}
                 </button>
 
                 <div
@@ -240,7 +303,7 @@ export default function ForgotPasswordPage({
               {message ? (
                 <p
                   className={
-                    success ? styles.formMessage : styles.formError
+                    success || requested ? styles.formMessage : styles.formError
                   }
                 >
                   {message}
