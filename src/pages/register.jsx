@@ -1,55 +1,40 @@
 import React, { useState, useRef } from "react";
 import styles from "../styles/login.module.css";
 import logoGraphic from "../assets/landing/final-logo.svg";
-import { register, updateProfile, getErrorMessage } from "../api";
+import { register, getErrorMessage } from "../api";
 
 const FIELD_LABELS = {
-  name: "Full Name",
   username: "Username",
   email: "Email",
-  age: "Age",
-  gender: "Gender",
   password: "Password",
   confirmPassword: "Confirm Password",
 };
 
 export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwitchToAbout, onSwitchToFeatures }) {
   const [formData, setFormData] = useState({
-    name: "",
     username: "",
     email: "",
-    age: "",
-    gender: "",
     password: "",
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const nameRef = useRef(null);
   const usernameRef = useRef(null);
   const emailRef = useRef(null);
-  const ageRef = useRef(null);
-  const genderRef = useRef(null);
   const passwordRef = useRef(null);
   const confirmPasswordRef = useRef(null);
 
   const fieldRefs = {
-    name: nameRef,
     username: usernameRef,
     email: emailRef,
-    age: ageRef,
-    gender: genderRef,
     password: passwordRef,
     confirmPassword: confirmPasswordRef,
   };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    // Age accepts digits only — no minus signs, decimals or 'e', max 3 digits
-    const nextValue =
-      name === "age" ? value.replace(/\D/g, "").slice(0, 3) : value;
-    setFormData((prev) => ({ ...prev, [name]: nextValue }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     setMessage("");
 
     if (name === "password" && formData.confirmPassword) {
@@ -110,11 +95,8 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
     event.preventDefault();
 
     const fieldOrder = [
-      "name",
       "username",
       "email",
-      "age",
-      "gender",
       "password",
       "confirmPassword",
     ];
@@ -180,16 +162,6 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });
-      try {
-        await updateProfile({
-          notification_prefs: {
-            full_name: formData.name.trim(),
-            age: Number(formData.age),
-            gender: formData.gender,
-          },
-        });
-      } catch {
-      }
       setMessage("Registration successful!");
       if (typeof onRegisterSuccess === "function") {
         onRegisterSuccess();
@@ -221,22 +193,6 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
                 className={`${styles.form} ${styles.registerForm}`}
               >
                 <div className={styles.inputGroup}>
-                  <label htmlFor="name">Full Name</label>
-                  <input
-                    ref={nameRef}
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    onKeyDown={handleKeyDown}
-                    onBlur={() => handleBlur("name")}
-                    placeholder="Enter your name"
-                  />
-                  <span className={styles.fieldError}>{errors.name}</span>
-                </div>
-
-                <div className={styles.inputGroup}>
                   <label htmlFor="username">Username</label>
                   <input
                     ref={usernameRef}
@@ -267,43 +223,6 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
                     placeholder="you@example.com"
                   />
                   <span className={styles.fieldError}>{errors.email}</span>
-                </div>
-
-                <div className={styles.inputGroup}>
-                  <label htmlFor="age">Age</label>
-                  <input
-                    ref={ageRef}
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    maxLength={3}
-                    id="age"
-                    name="age"
-                    value={formData.age}
-                    onChange={handleChange}
-                    onKeyDown={handleKeyDown}
-                    onBlur={() => handleBlur("age")}
-                    placeholder="Enter your age"
-                  />
-                  <span className={styles.fieldError}>{errors.age}</span>
-                </div>
-
-                <div className={styles.inputGroup}>
-                  <label htmlFor="gender">Gender</label>
-                  <select
-                    ref={genderRef}
-                    id="gender"
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleChange}
-                    onKeyDown={handleKeyDown}
-                    onBlur={() => handleBlur("gender")}
-                  >
-                    <option value="">Select gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                  </select>
-                  <span className={styles.fieldError}>{errors.gender}</span>
                 </div>
 
                 <div className={styles.inputGroup}>

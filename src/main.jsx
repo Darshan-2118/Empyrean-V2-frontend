@@ -1,5 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
 import ReactDOM from "react-dom/client";
+
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
 import ForgotPasswordPage from "./pages/forgot_password";
@@ -16,6 +18,8 @@ window.EmpyreanAPI = EmpyreanAPI;
 import AboutPage from "./pages/About";
 import FeaturesPage from "./pages/Features";
 import LiveMapPage from "./pages/liveMap";
+import AdminLoginPage from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const EmpyreanDashboardLayout = lazy(() => import("./pages/dashboard"));
 
@@ -29,6 +33,8 @@ const ROUTES = {
   features: "/features",
   liveMap: "/live-map",
   howItWorks: "/how_it_works",
+  adminLogin: "/admin/login",
+  adminDashboard: "/admin/dashboard",
 };
 
 const pageFromPath = (path) =>
@@ -39,6 +45,7 @@ function App() {
     pageFromPath(window.location.pathname),
   );
   const [auth, setAuth] = useState(getAuthState());
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
   useEffect(() => subscribeAuth(setAuth), []);
 
@@ -60,7 +67,11 @@ function App() {
     const hashEl = window.location.hash
       ? document.getElementById(window.location.hash.slice(1))
       : null;
-    if (hashEl) hashEl.scrollIntoView();
+    if (hashEl) {
+      hashEl.scrollIntoView();
+    } else {
+      window.scrollTo(0, 0);
+    }
   }, [currentPage]);
 
   const goTo = (page, { replace = false } = {}) => {
@@ -123,7 +134,7 @@ function App() {
 
     case "dashboard":
       pageEl = auth.isAuthenticated ? (
-        <Suspense fallback={<div style={{ minHeight: "100vh" }} />}>
+        <Suspense fallback={<div style={{ minHeight: "100vh", background: "#08201a" }} />}>
           <EmpyreanDashboardLayout
             user={auth.user}
             onSignedOut={() => navigate("landing")}
@@ -167,9 +178,31 @@ function App() {
       );
       break;
 
+    case "adminLogin":
+      pageEl = isAdminLoggedIn ? (
+        <AdminDashboard onLogout={() => setIsAdminLoggedIn(false)} />
+      ) : (
+        <AdminLoginPage
+          onLoginSuccess={() => setIsAdminLoggedIn(true)}
+          onBackToHome={() => navigate("landing")}
+        />
+      );
+      break;
+
+    case "adminDashboard":
+      pageEl = isAdminLoggedIn ? (
+        <AdminDashboard onLogout={() => setIsAdminLoggedIn(false)} />
+      ) : (
+        <AdminLoginPage
+          onLoginSuccess={() => setIsAdminLoggedIn(true)}
+          onBackToHome={() => navigate("landing")}
+        />
+      );
+      break;
+
     default: // login
       pageEl = auth.isAuthenticated ? (
-        <Suspense fallback={<div style={{ minHeight: "100vh" }} />}>
+        <Suspense fallback={<div style={{ minHeight: "100vh", background: "#08201a" }} />}>
           <EmpyreanDashboardLayout
             user={auth.user}
             onSignedOut={() => navigate("landing")}
