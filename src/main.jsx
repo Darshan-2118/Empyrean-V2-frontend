@@ -2,9 +2,12 @@ import React, { useState, useEffect, lazy, Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
+import ForgotPasswordPage from "./pages/forgot_password";
 import HowItWorksPage from "./pages/howItWorks";
 import LandingPage from "./pages/landingPage";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import pageStyles from "./styles/Page.module.css";
 import * as EmpyreanAPI from "./api";
 import { subscribeAuth, getAuthState } from "./api";
 
@@ -20,6 +23,7 @@ const ROUTES = {
   landing: "/landing_page",
   login: "/login",
   register: "/register",
+  forgotPassword: "/forgot-password",
   dashboard: "/dashboard",
   about: "/about",
   features: "/features",
@@ -50,6 +54,15 @@ function App() {
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
+  // On the landing page, scroll to the section referenced by a URL hash
+  // (e.g. /landing_page#features) when the page changes or is first loaded.
+  useEffect(() => {
+    const hashEl = window.location.hash
+      ? document.getElementById(window.location.hash.slice(1))
+      : null;
+    if (hashEl) hashEl.scrollIntoView();
+  }, [currentPage]);
+
   const goTo = (page, { replace = false } = {}) => {
     window.scrollTo(0, 0);
     setCurrentPage(page);
@@ -63,7 +76,12 @@ function App() {
   const navigate = (page) => goTo(page);
 
   useEffect(() => {
-    if (auth.isAuthenticated && (currentPage === "login" || currentPage === "register")) {
+    if (
+      auth.isAuthenticated &&
+      (currentPage === "login" ||
+        currentPage === "register" ||
+        currentPage === "forgotPassword")
+    ) {
       goTo("dashboard", { replace: true });
     } else if (currentPage === "dashboard" && !auth.isAuthenticated) {
       goTo("login", { replace: true });
@@ -90,7 +108,10 @@ function App() {
 
     case "features":
       pageEl = (
-        <FeaturesPage onSwitchToLogin={() => navigate("login")} />
+        <FeaturesPage
+          onSwitchToLogin={() => navigate("login")}
+          onSwitchToRegister={() => navigate("register")}
+        />
       );
       break;
 
@@ -112,6 +133,7 @@ function App() {
         <LoginPage
           onLoginSuccess={() => navigate("dashboard")}
           onSwitchToRegister={() => navigate("register")}
+          onSwitchToForgotPassword={() => navigate("forgotPassword")}
         />
       );
       break;
@@ -125,10 +147,22 @@ function App() {
       );
       break;
 
+    case "forgotPassword":
+      pageEl = (
+        <ForgotPasswordPage
+          onSwitchToLogin={() => navigate("login")}
+          onResetSuccess={() => navigate("login")}
+        />
+      );
+      break;
+
     case "landing":
       pageEl = (
         <LandingPage
           onSwitchToHowItWorks={() => navigate("howItWorks")}
+          onSwitchToFeatures={() => navigate("features")}
+          onSwitchToRegister={() => navigate("register")}
+          onSwitchToLogin={() => navigate("login")}
         />
       );
       break;
@@ -145,6 +179,7 @@ function App() {
         <LoginPage
           onLoginSuccess={() => navigate("dashboard")}
           onSwitchToRegister={() => navigate("register")}
+          onSwitchToForgotPassword={() => navigate("forgotPassword")}
         />
       );
   }
@@ -152,8 +187,11 @@ function App() {
 
   return (
     <>
-      <Navbar active={currentPage} onNavigate={navigate} />
-      {pageEl}
+      <Navbar active={currentPage} onNavigate={navigate} auth={auth} />
+      <div key={currentPage} className={pageStyles.page}>
+        {pageEl}
+      </div>
+      <Footer onNavigate={navigate} />
     </>
   );
 }

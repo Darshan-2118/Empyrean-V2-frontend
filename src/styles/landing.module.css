@@ -13,13 +13,11 @@
   background:
     linear-gradient(90deg, rgba(217, 217, 217, 0) 0%, #0c4137 77.4%, #ffffff 100%),
     linear-gradient(rgba(10, 31, 31, 0.7), rgba(10, 31, 31, 0.7)),
-    repeating-linear-gradient(
-      90deg,
+    repeating-linear-gradient(90deg,
       #08201a,
       #08201a 40px,
       #0c2a22 40px,
-      #0c2a22 80px
-    );
+      #0c2a22 80px);
   /* The teal→white gradient overlays the striped base; the dark veil and
      stripes keep normal compositing. */
   background-blend-mode: overlay, normal, normal;
@@ -31,7 +29,8 @@
 
 .hero {
   position: relative;
-  height: calc(100vh - 80px); /* minus the shared sticky navbar height */
+  height: calc(100vh - 80px);
+  /* minus the shared sticky navbar height */
   min-height: 560px;
   z-index: 0;
 }
@@ -119,6 +118,10 @@
   z-index: 1;
   text-align: center;
   padding: 0.5rem 2rem 0;
+  opacity: var(--hero-opacity, 1);
+  transform: translateY(var(--hero-y, 0px));
+  will-change: opacity, transform;
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
 }
 
 .wordmark {
@@ -166,12 +169,18 @@
 
 .textLeft {
   text-align: left;
+  transform: translateX(var(--text-left-x, 0px));
+  will-change: transform;
+  transition: transform 0.15s ease-out;
 }
 
 .textRight {
   /* Mirror of the left paragraph: same 3rem inset from the right edge, so it
      stays completely outside the orb's circle at the centre. */
   text-align: right;
+  transform: translateX(var(--text-right-x, 0px));
+  will-change: transform;
+  transition: transform 0.15s ease-out;
 }
 
 /* ===== Centerpiece orb =====
@@ -182,11 +191,15 @@
   position: absolute;
   bottom: -38vh;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(var(--orb-y, 0px)) scale(var(--orb-scale, 1));
   width: min(80vh, 820px);
   height: min(80vh, 820px);
-  z-index: 0;
+  /* z-index 5 keeps badges (children) above the features section (z-index 1) */
+  z-index: 5;
   pointer-events: none;
+  will-change: transform;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: visible;
 }
 
 /* Concentric outer ring — sits just outside the orb with a gap, extra white */
@@ -195,7 +208,8 @@
   inset: -22px;
   border-radius: 50%;
   border: 4px solid #abd1c6;
-  box-shadow: 0 0 26px rgba(171, 209, 198, 0.35);
+  box-shadow: 0 0 calc(26px + var(--orb-glow-spread, 0px)) rgba(171, 209, 198, 0.4);
+  transition: box-shadow 0.2s ease-out;
 }
 
 .orbGlow {
@@ -207,15 +221,13 @@
      820px disc forces a full re-blur on every scroll frame (and again under
      the sticky navbar), which flickers/glitches while scrolling. The soft
      centre glow comes from the gradient alone. */
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgba(180, 192, 126, 0.95) 0%,
-    rgba(180, 192, 126, 0.8) 12%,
-    rgba(180, 192, 126, 0.5) 24%,
-    rgba(0, 0, 0, 0.95) 48%,
-    #000000 60%,
-    #000000 100%
-  );
+  background: radial-gradient(circle at 50% 50%,
+      rgba(180, 192, 126, 0.95) 0%,
+      rgba(180, 192, 126, 0.8) 12%,
+      rgba(180, 192, 126, 0.5) 24%,
+      rgba(0, 0, 0, 0.95) 48%,
+      #000000 60%,
+      #000000 100%);
   animation: orbPulse 7s ease-in-out infinite;
 }
 
@@ -249,12 +261,15 @@
   z-index: 1;
   padding-top: 38vh;
   padding-bottom: 14rem;
-  /* Orb geometry shared by the feature-ball placement below: radius is
-     min(40vh, 410px) and the centre sits 38vh below the hero's bottom edge
-     (i.e. 2vh above the top of this section when the orb is at 80vh).
-     The balls orbit on --orbit-r, well OUTSIDE the orb and its white outer
-     ring (the ring's outer edge sits at orb radius + 26px). */
+  /* Orb geometry:
+     - The orb is anchored bottom: -38vh inside .hero (height: calc(100vh - 80px)).
+     - So the orb bottom edge sits 38vh below hero's bottom = 38vh below this
+       section's top edge.
+     - Orb radius = min(40vh, 410px), so the orb CENTRE is at:
+         top = 38vh - orb-r  (from this section's top).
+     - Badges orbit at --orbit-r = orb-r + 88px from the orb centre. */
   --orb-r: min(40vh, 410px);
+  --orb-cx: 50vw;
   --orb-cy: calc(38vh - var(--orb-r));
   --orbit-r: calc(var(--orb-r) + 88px);
 }
@@ -275,41 +290,58 @@
   z-index: 2;
 }
 
-/* ===== Feature balls on the orb's lower semicircle =====
-   Each ball's centre rides on --orbit-r (orb radius + 88px), which sits
-   clearly OUTSIDE the orb AND its white outer ring. The -38px offsets centre
-   the 76px balls on that radius. pos0/pos5 are the right/left of the orb,
-   pos1/pos4 the lower-right/left, pos2/pos3 the bottom-right/left. Labels
-   are placed radially outside the circle so no text sits inside the orb. */
+/* ===== Feature balls on the orb's outer ring =====
+   Badges are children of .orbWrap so they scale with the orb automatically.
 
+   All 6 badges stay on the LOWER semicircle (no badges above the equator).
+   Gap formula: orbit_offset = 22px (ring) + 30px (gap) + 38px (badge half) = 90px
+
+   Badge top-left formula (θ measured clockwise from 3 o’clock):
+     left = 50% + cos(θ)×50% + cos(θ)×90px − 38px
+     top  = 50% + sin(θ)×50% + sin(θ)×90px − 38px
+
+   Pre-computed positions (lower semicircle, 36° steps):
+     pos0  θ=0°    cos=1,      sin=0      → right equator
+     pos1  θ=36°   cos=0.809,  sin=0.588  → lower-right
+     pos2  θ=72°   cos=0.309,  sin=0.951  → bottom-right
+     pos3  θ=108°  cos=-0.309, sin=0.951  → bottom-left
+     pos4  θ=144°  cos=-0.809, sin=0.588  → lower-left
+     pos5  θ=180°  cos=-1,     sin=0      → left equator    */
+
+/* pos0 — right equator (3 o’clock) */
 .orbitPos0 {
-  left: calc(50vw + var(--orbit-r) - 38px);
-  top: calc(var(--orb-cy) - 38px);
+  left: calc(100% + 52px);
+  top:  calc(50% - 38px);
 }
 
+/* pos1 — lower-right (~4:30) */
 .orbitPos1 {
-  left: calc(50vw + 0.809 * var(--orbit-r) - 38px);
-  top: calc(var(--orb-cy) + 0.588 * var(--orbit-r) - 38px);
+  left: calc(90.45% + 34.81px);
+  top:  calc(79.4% + 14.92px);
 }
 
+/* pos2 — bottom-right (~5:30) */
 .orbitPos2 {
-  left: calc(50vw + 0.309 * var(--orbit-r) - 38px);
-  top: calc(var(--orb-cy) + 0.951 * var(--orbit-r) - 38px);
+  left: calc(65.45% - 10.19px);
+  top:  calc(97.55% + 47.59px);
 }
 
+/* pos3 — bottom-left (~6:30) */
 .orbitPos3 {
-  left: calc(50vw - 0.309 * var(--orbit-r) - 38px);
-  top: calc(var(--orb-cy) + 0.951 * var(--orbit-r) - 38px);
+  left: calc(34.55% - 65.81px);
+  top:  calc(97.55% + 47.59px);
 }
 
+/* pos4 — lower-left (~7:30) */
 .orbitPos4 {
-  left: calc(50vw - 0.809 * var(--orbit-r) - 38px);
-  top: calc(var(--orb-cy) + 0.588 * var(--orbit-r) - 38px);
+  left: calc(9.55% - 110.81px);
+  top:  calc(79.4% + 14.92px);
 }
 
+/* pos5 — left equator (9 o’clock) */
 .orbitPos5 {
-  left: calc(50vw - var(--orbit-r) - 38px);
-  top: calc(var(--orb-cy) - 38px);
+  left: calc(-128px);
+  top:  calc(50% - 38px);
 }
 
 /* Labels sit radially outside the circle, away from the orb */
@@ -326,33 +358,58 @@
   letter-spacing: 0.03em;
 }
 
-/* Right-side balls: text to the right of the badge */
-.orbitPos0 .featureLabel,
-.orbitPos1 .featureLabel {
-  left: calc(100% + 1rem);
+/* pos0 (right equator): label to the right */
+.orbitPos0 .featureLabel {
+  left: calc(100% + 0.8rem);
   top: 50%;
   transform: translateY(-50%);
   text-align: left;
-  width: 10rem;
+  width: 9rem;
 }
 
-/* Bottom balls: text below the badge */
-.orbitPos2 .featureLabel,
+/* pos1 (lower-right ~4:30): label to the right */
+.orbitPos1 .featureLabel {
+  left: calc(100% + 0.8rem);
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: left;
+  width: 9rem;
+}
+
+/* pos2 (bottom-right ~5:30): label below */
+.orbitPos2 .featureLabel {
+  top: calc(100% + 0.75rem);
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  width: 9rem;
+}
+
+/* pos3 (bottom-left ~6:30): label below */
 .orbitPos3 .featureLabel {
   top: calc(100% + 0.75rem);
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
+  width: 9rem;
 }
 
-/* Left-side balls: text to the left of the badge */
-.orbitPos4 .featureLabel,
-.orbitPos5 .featureLabel {
-  right: calc(100% + 1rem);
+/* pos4 (lower-left ~7:30): label to the left */
+.orbitPos4 .featureLabel {
+  right: calc(100% + 0.8rem);
   top: 50%;
   transform: translateY(-50%);
   text-align: right;
-  width: 10rem;
+  width: 9rem;
+}
+
+/* pos5 (left equator): label to the left */
+.orbitPos5 .featureLabel {
+  right: calc(100% + 0.8rem);
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: right;
+  width: 9rem;
 }
 
 .featureBadge {
@@ -386,6 +443,7 @@
     opacity: 0;
     transform: translateY(26px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -393,10 +451,13 @@
 }
 
 @keyframes orbPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.9;
   }
+
   50% {
     transform: scale(1.035);
     opacity: 1;
@@ -412,6 +473,7 @@
     opacity: 0;
     transform: translateY(24px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -429,6 +491,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .wordmark,
   .tagline,
   .textColumns {
@@ -564,4 +627,425 @@
   .featureLabel {
     font-size: 0.72rem;
   }
+}
+
+/* ===== See More button ===== */
+
+.seeMoreWrap {
+  display: flex;
+  justify-content: flex-end;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.seeMoreBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: rgba(12, 42, 34, 0.7);
+  border: 1px solid rgba(74, 222, 156, 0.45);
+  color: #4ade9c;
+  font-family: 'Gugi', sans-serif;
+  font-size: 0.92rem;
+  letter-spacing: 0.14em;
+  padding: 0.85rem 2.4rem;
+  border-radius: 999px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px rgba(74, 222, 156, 0.12), 0 4px 16px rgba(0,0,0,0.3);
+  transition: background 0.25s ease, border-color 0.25s ease,
+              box-shadow 0.25s ease, transform 0.2s ease;
+}
+
+.seeMoreBtn:hover {
+  background: rgba(74, 222, 156, 0.12);
+  border-color: #4ade9c;
+  box-shadow: 0 0 32px rgba(74, 222, 156, 0.25), 0 8px 24px rgba(0,0,0,0.35);
+  transform: translateY(-2px);
+}
+
+.seeMoreBtn:active {
+  transform: translateY(0);
+}
+
+/* ===== General Section Styling ===== */
+.sectionContainer {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 6rem 2rem;
+  font-family: 'Gugi', sans-serif;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.sectionTitle {
+  font-family: 'Aboreto', cursive;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  letter-spacing: 0.12em;
+  color: #ffffff;
+  margin: 0 0 1rem;
+  text-transform: uppercase;
+}
+
+.sectionSubtitle {
+  font-size: 1.05rem;
+  letter-spacing: 0.15em;
+  color: rgba(180, 215, 198, 0.85);
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ===== Hardware & Pipeline Grid ===== */
+.hardwareGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  margin-bottom: 5rem;
+}
+
+.hardwareCard {
+  background: rgba(12, 42, 34, 0.65);
+  border: 1px solid rgba(171, 209, 198, 0.2);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 2rem;
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.hardwareCard:hover {
+  transform: translateY(-8px);
+  border-color: rgba(74, 222, 156, 0.5);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 20px rgba(74, 222, 156, 0.15);
+}
+
+.cardNum {
+  font-family: 'Aboreto', cursive;
+  font-size: 2.2rem;
+  color: rgba(74, 222, 156, 0.4);
+  position: absolute;
+  top: 1.2rem;
+  right: 1.5rem;
+}
+
+.cardIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(74, 222, 156, 0.15);
+  color: #4ade9c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(74, 222, 156, 0.3);
+}
+
+.cardIcon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  color: #ffffff;
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.cardTag {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #4ade9c;
+  background: rgba(74, 222, 156, 0.1);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.08em;
+}
+
+.cardText {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: rgba(220, 235, 228, 0.8);
+  margin: 0;
+}
+
+/* ===== Pipeline Flow ===== */
+.pipelineRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  position: relative;
+}
+
+.pipelineStep {
+  background: rgba(8, 32, 26, 0.8);
+  border: 1px solid rgba(74, 222, 156, 0.25);
+  border-radius: 16px;
+  padding: 1.8rem 1.5rem;
+  text-align: center;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.pipelineStep:hover {
+  transform: translateY(-4px);
+  border-color: #4ade9c;
+}
+
+.stepBadge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #4ade9c;
+  color: #08201a;
+  font-weight: bold;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  box-shadow: 0 0 16px rgba(74, 222, 156, 0.4);
+}
+
+.stepTitle {
+  font-size: 1.1rem;
+  color: #ffffff;
+  margin: 0 0 0.5rem;
+}
+
+.stepText {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: rgba(200, 220, 210, 0.8);
+  margin: 0;
+}
+
+/* ===== Feature Deep Dive Cards ===== */
+.featuresDeepGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.featureDeepCard {
+  background: linear-gradient(135deg, rgba(12, 65, 55, 0.5) 0%, rgba(8, 32, 26, 0.7) 100%);
+  border: 1px solid rgba(171, 209, 198, 0.2);
+  border-radius: 20px;
+  padding: 2.2rem;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+}
+
+.featureDeepCard:hover {
+  transform: translateY(-6px);
+  border-color: rgba(74, 222, 156, 0.6);
+}
+
+.featureHeader {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.featureIconBadge {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: rgba(143, 174, 159, 0.2);
+  color: #4ade9c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  border: 1px solid rgba(143, 174, 159, 0.3);
+}
+
+.featureIconBadge svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* ===== Live Map Preview Card ===== */
+.mapPreviewBox {
+  background: rgba(10, 31, 31, 0.85);
+  border: 1px solid rgba(74, 222, 156, 0.3);
+  border-radius: 24px;
+  padding: 2.5rem;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.8rem;
+}
+
+.mapVisual {
+  width: 100%;
+  height: 280px;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 60% 40%, rgba(74, 222, 156, 0.2) 0%, transparent 60%),
+    radial-gradient(circle at 30% 70%, rgba(255, 146, 43, 0.25) 0%, transparent 50%),
+    linear-gradient(180deg, #091f1a 0%, #0c2a22 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mapBadgeRow {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.mapPill {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 0.85rem;
+}
+
+.dotGood {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4cdbaf;
+  box-shadow: 0 0 8px #4cdbaf;
+}
+
+.dotMod {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffd43b;
+  box-shadow: 0 0 8px #ffd43b;
+}
+
+.dotHigh {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff922b;
+  box-shadow: 0 0 8px #ff922b;
+}
+
+/* ===== Metrics & CTA Section ===== */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-bottom: 5rem;
+  text-align: center;
+}
+
+.metricCard {
+  background: rgba(12, 42, 34, 0.5);
+  border: 1px solid rgba(171, 209, 198, 0.18);
+  border-radius: 18px;
+  padding: 2rem 1.5rem;
+}
+
+.metricValue {
+  font-family: 'Aboreto', cursive;
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  color: #4ade9c;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 20px rgba(74, 222, 156, 0.3);
+}
+
+.metricLabel {
+  font-size: 0.9rem;
+  color: rgba(220, 235, 228, 0.8);
+  letter-spacing: 0.08em;
+}
+
+.ctaBanner {
+  background: linear-gradient(135deg, #0c4137 0%, #08201a 100%);
+  border: 1px solid rgba(74, 222, 156, 0.4);
+  border-radius: 28px;
+  padding: 4rem 2rem;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  margin-top: 30px;
+}
+
+.ctaTitle {
+  font-family: 'Aboreto', cursive;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  color: #ffffff;
+  margin: 0 0 1rem;
+}
+
+.ctaText {
+  font-size: 1.05rem;
+  color: rgba(220, 235, 228, 0.85);
+  max-width: 580px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.6;
+}
+
+.ctaButtons {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.primaryCtaBtn {
+  background: #4ade9c;
+  color: #08201a;
+  font-weight: bold;
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 999px;
+  font-family: 'Gugi', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 8px 24px rgba(74, 222, 156, 0.35);
+}
+
+.primaryCtaBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(74, 222, 156, 0.5);
+}
+
+.secondaryCtaBtn {
+  background: rgba(0, 0, 0, 0.4);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 1rem 2.5rem;
+  border-radius: 999px;
+  font-family: 'Gugi', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.secondaryCtaBtn:hover {
+  transform: translateY(-3px);
+  border-color: #4ade9c;
+  color: #4ade9c;
 }
