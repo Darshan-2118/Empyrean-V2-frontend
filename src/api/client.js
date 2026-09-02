@@ -1,4 +1,4 @@
-const API_BASE = "/api/v1";
+const API_BASE = `${import.meta.env.VITE_BACKEND_URL}/api/v1`;
 
 const STATUS_MESSAGES = {
   400: "Bad request — please check your input",
