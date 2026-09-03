@@ -1,6 +1,7 @@
 .pageContainer {
-  min-height: calc(100vh - 80px);
+  min-height: 100vh;
   width: 100%;
+  box-sizing: border-box;
   background:
     linear-gradient(rgba(10, 31, 31, 0.7), rgba(10, 31, 31, 0.7)),
     repeating-linear-gradient(
@@ -15,6 +16,14 @@
   color: white;
   position: relative;
   overflow-y: auto;
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+.pageContainer *,
+.pageContainer *::before,
+.pageContainer *::after {
+  box-sizing: border-box;
 }
 
 .pageContainer::before {

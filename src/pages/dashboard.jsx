@@ -7,6 +7,7 @@ import {
 import { LineChart, Line, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { MapContainer, TileLayer, Popup, CircleMarker, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import empyreanLogo from "../assets/landing/final-logo.svg";
 import {
   getLatestReadings, getReadingsHistory, getNodes, getAlerts,
   acknowledgeAlert, getProfile, updateProfile, logout, connectAlertsSocket,
@@ -201,7 +202,7 @@ function MapContent({ nodes, latest }) {
   const center = markers.length ? markers[0].position : DEFAULT_CENTER;
 
   return (
-    <div className="map-wrapper" style={{ height: "100%", width: "100%", borderRadius: "24px", overflow: "hidden", border: "1px solid var(--border-color)", zIndex: 0 }}>
+    <div className="map-wrapper" style={{ height: "calc(100dvh - 180px)", minHeight: "400px", width: "100%", borderRadius: "24px", overflow: "hidden", border: "1px solid var(--border-color)", zIndex: 0 }}>
       <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%", zIndex: 1 }}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -579,7 +580,7 @@ function OverviewContent({ reading, history, alerts, onAcknowledge }) {
   );
 }
 
-export default function EmpyreanDashboardLayout({ user, onSignedOut }) {
+export default function EmpyreanDashboardLayout({ user, onSignedOut, onNavigateHome }) {
   const [activeTab, setActiveTab] = useState("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [nodes, setNodes] = useState([]);
@@ -765,6 +766,10 @@ export default function EmpyreanDashboardLayout({ user, onSignedOut }) {
   return (
     <div className="dashboard">
       <header className="dashboard__header">
+        <div className="dashboard__brand" onClick={onNavigateHome} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigateHome?.(); } }}>
+          <img src={empyreanLogo} alt="Empyrean" className="dashboard__brand-logo" />
+          <span className="dashboard__brand-name">EMPYREAN</span>
+        </div>
         <AqiTickerSpace reading={selectedReading} nodeId={selectedNodeId} backendDown={backendDown} />
         <div className="search">
           <Search size={16} color="rgba(255,255,255,0.7)" />
@@ -775,7 +780,11 @@ export default function EmpyreanDashboardLayout({ user, onSignedOut }) {
       </header>
 
       <div className="dashboard__body">
-        <aside className={`rail ${isSidebarOpen ? "rail--open" : ""}`}>
+        <aside
+          className={`rail ${isSidebarOpen ? "rail--open" : ""}`}
+          onMouseEnter={() => setIsSidebarOpen(true)}
+          onMouseLeave={() => setIsSidebarOpen(false)}
+        >
           <div className="rail__logo-container">
             <button 
               className="icon-btn" 

@@ -72,7 +72,6 @@ export default function Footer({ onNavigate }) {
             </div>
             <p className={styles.brandTagline}>
               Real-time air quality monitoring for smarter, healthier cities.
-              Trusted by governments and researchers worldwide.
             </p>
           </div>
 

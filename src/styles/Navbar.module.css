@@ -155,6 +155,112 @@
   max-width: 160px;
 }
 
+/* ===== Profile avatar + dropdown ===== */
+
+.profileDropdown {
+  position: relative;
+}
+
+.profileAvatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4cdbaf, #00FFE6);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.25s ease, transform 0.2s ease;
+  padding: 0;
+}
+
+.profileAvatar:hover {
+  box-shadow: 0 0 20px rgba(76, 219, 175, 0.4);
+  transform: translateY(-1px);
+}
+
+.profileAvatarText {
+  font-family: 'Gugi', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #08201a;
+  line-height: 1;
+  user-select: none;
+}
+
+.profileDropdownMenu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 220px;
+  background: rgba(10, 31, 31, 0.97);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  z-index: 60;
+  padding: 8px 0;
+  animation: dropdownFadeIn 0.18s ease;
+}
+
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.profileDropdownHeader {
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profileDropdownName {
+  font-family: 'Gugi', sans-serif;
+  font-size: 0.95rem;
+  color: #e8f4ee;
+}
+
+.profileDropdownEmail {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profileDropdownItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  font-family: 'Gugi', sans-serif;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.profileDropdownItem:hover {
+  background: rgba(76, 219, 175, 0.1);
+  color: #4cdbaf;
+}
+
+.profileDropdownItemDanger {
+  color: #ff6b6b;
+}
+
+.profileDropdownItemDanger:hover {
+  background: rgba(255, 107, 107, 0.1);
+  color: #ff6b6b;
+}
+
 /* ===== Responsive ===== */
 
 
@@ -211,41 +317,15 @@
     display: flex;
     
   }
+}
 
+/* ===== Compact navbar (dashboard / admin — logo + name only) ===== */
 
+.navbarCompact {
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
 
-  .sidebarLinks {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    width: 100%;
-    align-items: center;
-  }
-
-  .sidebarLinks a {
-    color: #e8f0ec;
-    text-decoration: none;
-    font-size: 1.1rem;
-    font-weight: 500;
-  }
-
-  .sidebarLinks a:hover,
-  .sidebarLinks .navActive {
-    color: #4cdbaf;
-  }
-
-  .sidebarAuth {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: 100%;
-    max-width: 250px;
-  }
-
-  .sidebarAuth .authBtn {
-    width: 100%;
-    text-align: center;
-    padding: 0.85rem;
-    font-size: 1rem;
-  }
+.navbarCompact .brand {
+  justify-self: center;
 }

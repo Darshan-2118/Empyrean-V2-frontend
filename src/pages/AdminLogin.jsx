@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import styles from "../styles/adminLogin.module.css";
+import { setSession } from "../api";
 
 const ADMIN_USERNAME = "Darshan";
 const ADMIN_PASSWORD = "Darsh@2118";
@@ -64,6 +65,15 @@ export default function AdminLoginPage({ onLoginSuccess, onBackToHome }) {
       formData.username === ADMIN_USERNAME &&
       formData.password === ADMIN_PASSWORD
     ) {
+      setSession({
+        access_token: "admin-local",
+        refresh_token: "admin-local",
+        user: {
+          username: "Darshan",
+          email: "darshan2027csdrrce@gmail.com",
+          role: "admin",
+        },
+      });
       onLoginSuccess();
     } else {
       setMessage("Invalid admin credentials");
