@@ -203,6 +203,7 @@
 
 /* ===== Mobile responsiveness ===== */
 
+/* mobile responsive design */
 @media (max-width: 600px) {
   .pageContainer {
     padding: 1.5rem;

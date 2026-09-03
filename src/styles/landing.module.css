@@ -570,9 +570,17 @@
   }
 
   .orbWrap {
-    width: min(76vh, 620px);
-    height: min(76vh, 620px);
-    bottom: -34vh;
+    width: 260px;
+    height: 260px;
+    bottom: -130px;
+    overflow: visible;
+  }
+  
+  .orbOuterRing, .orbGlow {
+    width: 260px;
+    height: 260px;
+    top: 0;
+    left: 0;
   }
 
   .trackButton {
@@ -581,7 +589,7 @@
   }
 
   .features {
-    padding-top: 34vh;
+    padding-top: 580px;
     padding-bottom: 4rem;
   }
 
@@ -592,9 +600,15 @@
     margin: 0 auto;
   }
 
+  .orbitPos0 { top: 290px; left: -10px; position: absolute !important; }
+  .orbitPos1 { top: 290px; left: 180px; position: absolute !important; }
+  .orbitPos2 { top: 430px; left: -10px; position: absolute !important; }
+  .orbitPos3 { top: 430px; left: 180px; position: absolute !important; }
+  .orbitPos4 { top: 570px; left: -10px; position: absolute !important; }
+  .orbitPos5 { top: 570px; left: 180px; position: absolute !important; }
+
   .featureItem {
-    position: static;
-    width: 80px;
+    width: 90px !important;
     height: auto;
     display: flex;
     flex-direction: column;
@@ -608,7 +622,7 @@
     left: auto;
     right: auto;
     transform: none;
-    width: auto;
+    width: 100%;
     text-align: center;
   }
 
@@ -1046,4 +1060,28 @@
   transform: translateY(-3px);
   border-color: #4ade9c;
   color: #4ade9c;
+}
+
+/* mobile responsive design */
+@media (max-width: 768px) {
+  .sectionContainer {
+    padding: 3rem 1.25rem;
+  }
+  .seeMoreWrap {
+    padding: 0 1.25rem 1.5rem;
+  }
+  .ctaBanner {
+    padding: 2.5rem 1.5rem;
+  }
+  .mapPreviewBox {
+    padding: 1.5rem;
+  }
+  
+  /* Fix horizontal overflow on grids */
+  .hardwareGrid,
+  .pipelineRow,
+  .featuresDeepGrid,
+  .metricsGrid {
+    grid-template-columns: 1fr;
+  }
 }

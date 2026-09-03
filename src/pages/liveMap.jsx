@@ -34,7 +34,8 @@ const controlsStyle = {
   alignItems: "center",
   gap: "10px",
   zIndex: 1000,
-  minWidth: "350px",
+  /* mobile responsive design */
+  width: "min(90%, 350px)",
   boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
 };
 

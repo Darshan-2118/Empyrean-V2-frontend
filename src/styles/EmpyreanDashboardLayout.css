@@ -967,6 +967,7 @@ input:checked + .slider:before {
 
 /* ===== Medium screens (tablets / small laptops) ===== */
 
+/* mobile responsive design */
 @media (max-width: 1100px) {
   .dashboard {
     height: calc(100vh - 80px);
@@ -1000,6 +1001,7 @@ input:checked + .slider:before {
 
 /* ===== Mobile screens ===== */
 
+/* mobile responsive design */
 @media (max-width: 768px) {
   .dashboard {
     height: calc(100dvh - 80px);
@@ -1077,6 +1079,7 @@ input:checked + .slider:before {
 
 /* ===== Small mobile screens ===== */
 
+/* mobile responsive design */
 @media (max-width: 480px) {
   .dashboard__logo-text {
     display: none;
@@ -1089,5 +1092,47 @@ input:checked + .slider:before {
   .sensor-grid {
     grid-template-columns: 1fr 1fr;
     gap: 12px;
+  }
+}
+
+
+/* mobile responsive design */
+@media (max-width: 768px) {
+  .dashboard__body {
+    position: relative;
+  }
+  
+  .rail {
+    position: absolute !important;
+    height: 100%;
+    z-index: 50;
+    width: 64px;
+    background: #08201a !important; /* solid background */
+    border-right: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    transition: width 0.3s ease !important;
+  }
+
+  .rail--open {
+    width: 260px !important;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.6);
+  }
+
+  .main {
+    margin-left: 64px;
+    width: calc(100% - 64px);
+    box-sizing: border-box;
+  }
+  
+  .rail-btn--open {
+    width: 100%;
+    justify-content: flex-start !important;
+    padding: 0 16px !important;
+  }
+  
+  .rail-btn__text {
+    white-space: normal;
+    text-align: left;
+    line-height: 1.2;
   }
 }

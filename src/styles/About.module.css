@@ -120,3 +120,24 @@
   line-height: 1.6;
   font-size: 1rem;
 }
+
+
+/* mobile responsive design */
+@media (max-width: 768px) {
+  .about-main-wrapper {
+    padding: 2rem 1rem 3rem 1rem;
+  }
+  .about-glass-card-override {
+    padding: 2rem 1.5rem;
+    min-height: auto;
+  }
+  .about-brand-title {
+    font-size: 2rem;
+  }
+  .about-grid-section, .about-approach-section {
+    grid-template-columns: 1fr;
+  }
+  .about-card-title, .about-team-title {
+    font-size: 1.2rem;
+  }
+}

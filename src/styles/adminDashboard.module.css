@@ -255,6 +255,7 @@
   height: 300px;
 }
 
+/* mobile responsive design */
 @media (max-width: 900px) {
   .statsRow {
     grid-template-columns: 1fr;
