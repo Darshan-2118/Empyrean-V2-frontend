@@ -1,11 +1,7 @@
 import React, { Fragment, useEffect, useRef, useState } from "react";
 import styles from "../styles/howItWorks.module.css";
 
-import realTimeIcon from "../assets/landing/real-time.svg";
-import locationIcon from "../assets/landing/location-tracking.svg";
-import secureIcon from "../assets/landing/secure-data.svg";
-import notificationIcon from "../assets/landing/notification.svg";
-import trendsIcon from "../assets/landing/trends.svg";
+import { Wind, MapPin, Cpu, Wifi } from "lucide-react";
 
 /* ===== Hardware that ships with the Empyrean device =====
    Each part maps to a numbered pin on the annotated diagram below. */
@@ -13,26 +9,26 @@ import trendsIcon from "../assets/landing/trends.svg";
 const DEVICE_PARTS = [
   {
     num: "01",
-    icon: realTimeIcon,
+    icon: Wind,
     title: "Air Quality Sensors",
     tag: "MQ135 + PMS5003",
     text: "Continuously measure particulate matter (PM2.5, PM10) and chemical compounds such as CO₂, NH₃, and benzene.",
   },
   {
     num: "02",
-    icon: locationIcon,
+    icon: MapPin,
     title: "GPS Module",
     text: "Records real-time latitude and longitude, so every single reading is geo-tagged to a precise location.",
   },
   {
     num: "03",
-    icon: secureIcon,
+    icon: Cpu,
     title: "ESP32 Processor",
     text: "The on-board brain reads all sensor values and GPS coordinates at defined intervals, then packages them into structured data.",
   },
   {
     num: "04",
-    icon: trendsIcon,
+    icon: Wifi,
     title: "Wi-Fi Link",
     text: "Streams timestamped JSON payloads to the cloud over MQTT/HTTP — no cables, no manual syncing.",
   },
@@ -202,7 +198,9 @@ export default function HowItWorksPage({
                 style={{ "--reveal-delay": `${(index % 4) * 90}ms` }}
               >
                 <span className={styles.partNum}>{part.num}</span>
-                <img src={part.icon} alt="" className={styles.partIcon} />
+                <div className={styles.partIconWrapper}>
+                  <part.icon size={28} color="#4cdbaf" strokeWidth={1.5} className={styles.partIcon} />
+                </div>
                 <div className={styles.partBody}>
                   <h3 className={styles.partTitle}>{part.title}</h3>
                   {part.tag ? (

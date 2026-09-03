@@ -913,3 +913,16 @@
     padding: 2.25rem 1.25rem;
   }
 }
+
+.partIconWrapper {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: rgba(76, 219, 175, 0.05);
+  border: 1px solid rgba(76, 219, 175, 0.15);
+  border-radius: 8px;
+  margin-right: 12px;
+}
