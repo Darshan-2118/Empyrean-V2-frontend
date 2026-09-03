@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { Menu, X } from "lucide-react";
 import styles from "../styles/Navbar.module.css";
 import empyreanLogo from "../assets/landing/final-logo.svg";
 
@@ -83,6 +84,7 @@ function ProfileDropdown({ user, onNavigate, onSettings, onSignOut }) {
 
 export default function Navbar({ active, onNavigate, auth, onSettings, onSignOut }) {
   const [landingSection, setLandingSection] = useState("home");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const isDashboard = active === "dashboard";
   const isAdminDashboard = active === "adminDashboard";
@@ -128,8 +130,11 @@ export default function Navbar({ active, onNavigate, auth, onSettings, onSignOut
   const displayActive = active === "landing" ? SECTION_PATHS[landingSection] : active;
   const go = (path) => (e) => {
     e.preventDefault();
+    setIsSidebarOpen(false);
     onNavigate?.(path);
   };
+
+  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 
   // On the user dashboard the global Navbar is not rendered (the dashboard has
   // its own header bar with the logo).
@@ -149,59 +154,133 @@ export default function Navbar({ active, onNavigate, auth, onSettings, onSignOut
 
       {!isAdminDashboard && (
         <>
-          <div className={styles.links}>
-            {NAV.map((item) =>
-              item.disabled ? (
-                <a
-                  key={item.label}
-                  href="#map"
-                  className={styles.disabled}
-                  aria-disabled="true"
-                  role="link"
-                  onClick={(e) => e.preventDefault()}
-                >
-                  {item.label}
-                </a>
+          <div className={styles.desktopLinks}>
+            <div className={styles.links}>
+              {NAV.map((item) =>
+                item.disabled ? (
+                  <a
+                    key={item.label}
+                    href="#map"
+                    className={styles.disabled}
+                    aria-disabled="true"
+                    role="link"
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <a
+                    key={item.label}
+                    href={`#${item.path}`}
+                    className={item.path === displayActive ? styles.navActive : undefined}
+                    onClick={go(item.path)}
+                  >
+                    {item.label}
+                  </a>
+                ),
+              )}
+            </div>
+
+            <div className={styles.authActions}>
+              {auth?.isAuthenticated ? (
+                <ProfileDropdown
+                  user={auth.user}
+                  onNavigate={onNavigate}
+                  onSettings={onSettings}
+                  onSignOut={onSignOut}
+                />
               ) : (
-                <a
-                  key={item.label}
-                  href={`#${item.path}`}
-                  className={item.path === displayActive ? styles.navActive : undefined}
-                  onClick={go(item.path)}
-                >
-                  {item.label}
-                </a>
-              ),
-            )}
+                <>
+                  <button
+                    type="button"
+                    className={styles.authBtn}
+                    onClick={() => onNavigate?.("login")}
+                  >
+                    Login
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.authBtn} ${styles.authBtnPrimary}`}
+                    onClick={() => onNavigate?.("register")}
+                  >
+                    Register
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
-          <div className={styles.authActions}>
-            {auth?.isAuthenticated ? (
-              <ProfileDropdown
-                user={auth.user}
-                onNavigate={onNavigate}
-                onSettings={onSettings}
-                onSignOut={onSignOut}
-              />
-            ) : (
-              <>
-                <button
-                  type="button"
-                  className={styles.authBtn}
-                  onClick={() => onNavigate?.("login")}
-                >
-                  Login
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.authBtn} ${styles.authBtnPrimary}`}
-                  onClick={() => onNavigate?.("register")}
-                >
-                  Register
-                </button>
-              </>
-            )}
+          {/* Mobile Hamburger */}
+          <button
+            className={styles.hamburger}
+            onClick={toggleSidebar}
+            aria-label="Toggle Menu"
+          >
+            {isSidebarOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+
+          {/* Mobile Sidebar */}
+          <div
+            className={`${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ""}`}
+          >
+            <div className={styles.sidebarLinks}>
+              {NAV.map((item) =>
+                item.disabled ? (
+                  <span
+                    key={item.label}
+                    className={styles.disabled}
+                    aria-disabled="true"
+                    role="link"
+                  >
+                    {item.label}
+                  </span>
+                ) : (
+                  <button
+                    key={item.label}
+                    type="button"
+                    className={
+                      item.path === displayActive ? styles.navActive : undefined
+                    }
+                    onClick={go(item.path)}
+                  >
+                    {item.label}
+                  </button>
+                ),
+              )}
+            </div>
+            <div className={styles.sidebarAuth}>
+              {auth?.isAuthenticated ? (
+                <ProfileDropdown
+                  user={auth.user}
+                  onNavigate={onNavigate}
+                  onSettings={onSettings}
+                  onSignOut={onSignOut}
+                />
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className={`${styles.authBtn} ${styles.authBtnPrimary}`}
+                    onClick={() => { setIsSidebarOpen(false); onNavigate?.("login"); }}
+                  >
+                    Login
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.authBtn} ${styles.authBtnPrimary}`}
+                    onClick={() => { setIsSidebarOpen(false); onNavigate?.("register"); }}
+                  >
+                    Register
+                  </button>
+                </>
+              )}
+            </div>
           </div>
+
+          {/* Overlay for sidebar */}
+          {isSidebarOpen && (
+            <div className={styles.overlay} onClick={toggleSidebar} />
+          )}
         </>
       )}
     </nav>
