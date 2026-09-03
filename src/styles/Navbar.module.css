@@ -278,6 +278,59 @@
   display: none;
 }
 
+/* ===== Mobile sidebar inner styles ===== */
+
+.sidebarLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  align-items: center;
+}
+
+.sidebarLinks,
+.sidebarLinks button {
+  background: none;
+  border: none;
+  font-family: inherit;
+}
+
+.sidebarLinks a,
+.sidebarLinks button {
+  color: #e8f0ec;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.sidebarLinks a:hover,
+.sidebarLinks button:hover,
+.sidebarLinks .navActive {
+  color: #4cdbaf;
+}
+
+.sidebarAuth {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  align-items: center;
+}
+
+.sidebarAuth .authBtn {
+  width: 100%;
+  max-width: 250px;
+  text-align: center;
+  padding: 0.85rem;
+  font-size: 1rem;
+}
+
+.sidebarAuth .profileDropdown {
+  display: flex;
+  justify-content: center;
+}
+
 @media (max-width: 860px) {
   .navbar {
     height: auto;
@@ -307,15 +360,25 @@
     display: none;
     flex-direction: column;
     width: 100%;
-    background: transparent;
-    padding: 1.5rem 0 1rem;
+    position: relative;
+    z-index: 5;
+    background: rgba(6, 24, 20, 0.95);
+    padding: 1.5rem 1rem 1rem;
     gap: 1.5rem;
     align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .sidebarOpen {
     display: flex;
-    
+  }
+
+  .overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 4;
   }
 }
 
