@@ -28,6 +28,7 @@ const ROUTES = {
   login: "/login",
   register: "/register",
   forgotPassword: "/forgot-password",
+  resetPassword: "/reset-password",
   dashboard: "/dashboard",
   about: "/about",
   features: "/features",
@@ -91,7 +92,8 @@ function App() {
       auth.isAuthenticated &&
       (currentPage === "login" ||
         currentPage === "register" ||
-        currentPage === "forgotPassword")
+        currentPage === "forgotPassword" ||
+        currentPage === "resetPassword")
     ) {
       goTo("dashboard", { replace: true });
     } else if (currentPage === "dashboard" && !auth.isAuthenticated) {
@@ -159,6 +161,15 @@ function App() {
       break;
 
     case "forgotPassword":
+      pageEl = (
+        <ForgotPasswordPage
+          onSwitchToLogin={() => navigate("login")}
+          onResetSuccess={() => navigate("login")}
+        />
+      );
+      break;
+
+    case "resetPassword":
       pageEl = (
         <ForgotPasswordPage
           onSwitchToLogin={() => navigate("login")}

@@ -36,6 +36,9 @@ Then open:
 ```text
 http://localhost:5173/
 ```
+```text
+npx serve -s dist -l 4173
+```
 
 ### 4) Build for production
 ```bash
