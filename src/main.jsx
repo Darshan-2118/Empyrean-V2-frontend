@@ -1,6 +1,8 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
 import ReactDOM from "react-dom/client";
 
+import "./index.css";
+
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
@@ -46,7 +48,6 @@ function App() {
     pageFromPath(window.location.pathname),
   );
   const [auth, setAuth] = useState(getAuthState());
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
   useEffect(() => subscribeAuth(setAuth), []);
 
@@ -87,6 +88,23 @@ function App() {
 
   const navigate = (page) => goTo(page);
 
+  // Read the latest session at call time (avoids stale closures when a
+  // callback fires right after setSession updates the module state).
+  const homeForCurrentUser = () =>
+    getAuthState().user?.role === "admin" ? "adminDashboard" : "dashboard";
+
+  const handleLoginSuccess = () => navigate(homeForCurrentUser());
+  const handleRegisterSuccess = () => navigate(homeForCurrentUser());
+
+  const handleNavbarSignOut = async () => {
+    try {
+      await EmpyreanAPI.logout();
+    } catch {
+      // session is cleared regardless
+    }
+    navigate("landing");
+  };
+
   useEffect(() => {
     if (
       auth.isAuthenticated &&
@@ -95,11 +113,19 @@ function App() {
         currentPage === "forgotPassword" ||
         currentPage === "resetPassword")
     ) {
-      goTo("dashboard", { replace: true });
+      if (auth.user?.role === "admin") {
+        goTo("adminDashboard", { replace: true });
+      } else {
+        goTo("dashboard", { replace: true });
+      }
     } else if (currentPage === "dashboard" && !auth.isAuthenticated) {
       goTo("login", { replace: true });
+    } else if (currentPage === "adminDashboard" && !auth.isAuthenticated) {
+      goTo("login", { replace: true });
+    } else if (currentPage === "dashboard" && auth.isAuthenticated && auth.user?.role === "admin") {
+      goTo("adminDashboard", { replace: true });
     }
-  }, [currentPage, auth.isAuthenticated]);
+  }, [currentPage, auth.isAuthenticated, auth.user?.role]);
 
   let pageEl;
 
@@ -107,7 +133,7 @@ function App() {
     case "register":
       pageEl = (
         <RegisterPage
-          onRegisterSuccess={() => navigate("dashboard")}
+          onRegisterSuccess={handleRegisterSuccess}
           onSwitchToLogin={() => navigate("login")}
         />
       );
@@ -140,11 +166,12 @@ function App() {
           <EmpyreanDashboardLayout
             user={auth.user}
             onSignedOut={() => navigate("landing")}
+            onNavigateHome={() => navigate("landing")}
           />
         </Suspense>
       ) : (
         <LoginPage
-          onLoginSuccess={() => navigate("dashboard")}
+          onLoginSuccess={handleLoginSuccess}
           onSwitchToRegister={() => navigate("register")}
           onSwitchToForgotPassword={() => navigate("forgotPassword")}
         />
@@ -190,22 +217,30 @@ function App() {
       break;
 
     case "adminLogin":
-      pageEl = isAdminLoggedIn ? (
-        <AdminDashboard onLogout={() => setIsAdminLoggedIn(false)} />
+      pageEl = auth.isAuthenticated && auth.user?.role === "admin" ? (
+        <AdminDashboard onLogout={() => navigate("landing")} />
       ) : (
         <AdminLoginPage
-          onLoginSuccess={() => setIsAdminLoggedIn(true)}
+          onLoginSuccess={handleLoginSuccess}
           onBackToHome={() => navigate("landing")}
         />
       );
       break;
 
     case "adminDashboard":
-      pageEl = isAdminLoggedIn ? (
-        <AdminDashboard onLogout={() => setIsAdminLoggedIn(false)} />
+      pageEl = auth.isAuthenticated && auth.user?.role === "admin" ? (
+        <AdminDashboard onLogout={() => navigate("landing")} />
+      ) : auth.isAuthenticated ? (
+        <Suspense fallback={<div style={{ minHeight: "100vh", background: "#08201a" }} />}>
+          <EmpyreanDashboardLayout
+            user={auth.user}
+            onSignedOut={() => navigate("landing")}
+            onNavigateHome={() => navigate("landing")}
+          />
+        </Suspense>
       ) : (
         <AdminLoginPage
-          onLoginSuccess={() => setIsAdminLoggedIn(true)}
+          onLoginSuccess={handleLoginSuccess}
           onBackToHome={() => navigate("landing")}
         />
       );
@@ -217,11 +252,12 @@ function App() {
           <EmpyreanDashboardLayout
             user={auth.user}
             onSignedOut={() => navigate("landing")}
+            onNavigateHome={() => navigate("landing")}
           />
         </Suspense>
       ) : (
         <LoginPage
-          onLoginSuccess={() => navigate("dashboard")}
+          onLoginSuccess={handleLoginSuccess}
           onSwitchToRegister={() => navigate("register")}
           onSwitchToForgotPassword={() => navigate("forgotPassword")}
         />
@@ -231,7 +267,13 @@ function App() {
 
   return (
     <>
-      <Navbar active={currentPage} onNavigate={navigate} auth={auth} />
+      <Navbar
+        active={currentPage}
+        onNavigate={navigate}
+        auth={auth}
+        onSettings={() => handleLoginSuccess()}
+        onSignOut={handleNavbarSignOut}
+      />
       <div key={currentPage} className={pageStyles.page}>
         {pageEl}
       </div>

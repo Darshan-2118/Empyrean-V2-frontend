@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import styles from "../styles/login.module.css";
 import logoGraphic from "../assets/landing/final-logo.svg";
-import { login, ApiError, getErrorMessage } from "../api";
+import { login, setSession, ApiError, getErrorMessage } from "../api";
 
 const FIELD_LABELS = {
   username: "Username",
@@ -81,6 +81,30 @@ export default function LoginPage({
     setSubmitting(true);
     setMessage("");
     try {
+      // Darshan is a pre-provisioned admin: he only needs to log in with his
+      // fixed credentials — no backend registration required.
+      if (formData.username === "Darshan") {
+        if (formData.password !== "Darsh@2118") {
+          setMessage("Invalid username or password");
+          setSubmitting(false);
+          return;
+        }
+        setSession({
+          access_token: "admin-local",
+          refresh_token: "admin-local",
+          user: {
+            username: "Darshan",
+            email: "darshan2027csdrrce@gmail.com",
+            role: "admin",
+          },
+        });
+        if (typeof onLoginSuccess === "function") {
+          onLoginSuccess();
+        }
+        setSubmitting(false);
+        return;
+      }
+
       await login({ username: formData.username, password: formData.password });
       if (typeof onLoginSuccess === "function") {
         onLoginSuccess();

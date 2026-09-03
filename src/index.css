@@ -1,0 +1,48 @@
+/* Global dark scrollbar styling to avoid a light/white native scrollbar
+   against the dark theme. */
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(76, 219, 175, 0.5) rgba(8, 32, 26, 0.9);
+}
+
+html::-webkit-scrollbar {
+  width: 10px;
+}
+
+html::-webkit-scrollbar-track {
+  background: rgba(8, 32, 26, 0.9);
+}
+
+html::-webkit-scrollbar-thumb {
+  background: rgba(76, 219, 175, 0.4);
+  border-radius: 10px;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: rgba(76, 219, 175, 0.6);
+}
+
+/* Scrollable inner regions (dashboard content) */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(76, 219, 175, 0.35);
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(76, 219, 175, 0.55);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(76, 219, 175, 0.35) transparent;
+}

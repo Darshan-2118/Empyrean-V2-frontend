@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import styles from "../styles/login.module.css";
 import logoGraphic from "../assets/landing/final-logo.svg";
-import { register, getErrorMessage } from "../api";
+import { register, setSession, getErrorMessage } from "../api";
 
 const FIELD_LABELS = {
   username: "Username",
@@ -162,6 +162,7 @@ export default function RegisterPage({ onRegisterSuccess, onSwitchToLogin, onSwi
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });
+      setSession({ role: "user" });
       setMessage("Registration successful!");
       if (typeof onRegisterSuccess === "function") {
         onRegisterSuccess();
