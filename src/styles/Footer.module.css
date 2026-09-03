@@ -127,10 +127,11 @@
 /* mobile responsive design */
 @media (max-width: 480px) {
   .footerGrid {
-    grid-template-columns: 1fr;
-    text-align: center;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    text-align: left;
   }
-  .linkCol {
-    align-items: center;
+  .brandBlock {
+    grid-column: 1 / -1;
   }
 }
